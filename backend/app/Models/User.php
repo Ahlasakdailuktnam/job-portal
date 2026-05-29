@@ -24,7 +24,9 @@ class User extends Authenticatable
     'google_id',
     'otp',
     'otp_expires_at',
-    'is_verified'
+    'is_verified',
+    'role'
+
 ];
     /**
      * The attributes that should be hidden for serialization.
