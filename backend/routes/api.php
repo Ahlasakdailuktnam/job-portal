@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/auth/google', [AuthController::class, 'google']);
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
 
+    Route::post('/payments', [PaymentController::class, 'store']);
+    Route::post(
+    '/payments/check/{id}',
+    [PaymentController::class, 'checkPayment']
+);
+
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/ ', [AuthController::class, 'verifyOtp']);
@@ -38,7 +44,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/subscriptions/{id}', [SubscriptionController::class, 'destroy']);
 
     //payment
-    Route::post('/payments', [PaymentController::class, 'store']);
     Route::get('/payments/{id}', [PaymentController::class, 'show']);
 
 
