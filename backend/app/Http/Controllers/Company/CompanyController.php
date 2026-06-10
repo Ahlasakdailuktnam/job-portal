@@ -8,9 +8,11 @@ use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {
-   public function index()
+    public function index()
     {
-        $companies = Company::with('user')->latest()->get();
+        $companies = Company::with('user')
+            ->latest()
+            ->get();
 
         return response()->json([
             'success' => true,
@@ -20,6 +22,18 @@ class CompanyController extends Controller
 
     public function store(Request $request)
     {
+        $existingCompany = Company::where(
+            'user_id',
+            auth()->id()
+        )->exists();
+
+        if ($existingCompany) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You already have a company profile'
+            ], 400);
+        }
+
         $validated = $request->validate([
             'company_name' => 'required|string|max:255',
             'logo' => 'nullable|string',
@@ -43,7 +57,8 @@ class CompanyController extends Controller
 
     public function show($id)
     {
-        $company = Company::with('user')->findOrFail($id);
+        $company = Company::with('user')
+            ->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -53,7 +68,15 @@ class CompanyController extends Controller
 
     public function update(Request $request, $id)
     {
-        $company = Company::findOrFail($id);
+        $company = Company::where(
+            'id',
+            $id
+        )
+        ->where(
+            'user_id',
+            auth()->id()
+        )
+        ->firstOrFail();
 
         $validated = $request->validate([
             'company_name' => 'sometimes|string|max:255',
@@ -75,7 +98,15 @@ class CompanyController extends Controller
 
     public function destroy($id)
     {
-        $company = Company::findOrFail($id);
+        $company = Company::where(
+            'id',
+            $id
+        )
+        ->where(
+            'user_id',
+            auth()->id()
+        )
+        ->firstOrFail();
 
         $company->delete();
 

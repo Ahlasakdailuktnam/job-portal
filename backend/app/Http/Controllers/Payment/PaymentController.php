@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Services\KhqrService;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
@@ -17,9 +16,23 @@ class PaymentController extends Controller
             'subscription_id' => 'required|exists:subscriptions,id',
         ]);
 
-        $subscription = Subscription::findOrFail(
+        $subscription = Subscription::where(
+            'id',
             $validated['subscription_id']
-        );
+        )
+        ->where(
+            'user_id',
+            auth()->id()
+        )
+        ->firstOrFail();
+
+        // Prevent creating payment for active subscription
+        if ($subscription->status === 'active') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Subscription is already active'
+            ], 400);
+        }
 
         $transactionId = 'SUB_' . time();
 
@@ -32,9 +45,9 @@ class PaymentController extends Controller
 
         $khqr = new KhqrService();
 
-        $qrResponse = $khqr->generateQr(
+        $checkoutUrl = $khqr->generateCheckoutUrl(
             $transactionId,
-            (float)$payment->amount,
+            (float) $payment->amount,
             'Subscription Payment'
         );
 
@@ -42,7 +55,7 @@ class PaymentController extends Controller
             'success' => true,
             'message' => 'Payment created successfully',
             'payment' => $payment,
-            'khqr' => $qrResponse
+            'checkout_url' => $checkoutUrl,
         ]);
     }
 
@@ -51,53 +64,101 @@ class PaymentController extends Controller
         $payment = Payment::with('subscription')
             ->findOrFail($id);
 
+        if (
+            $payment->subscription->user_id !== auth()->id()
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
         return response()->json([
             'success' => true,
             'data' => $payment
         ]);
     }
+
     public function checkPayment($id)
-{
-    $payment = Payment::with([
-        'subscription.plan'
-    ])->findOrFail($id);
+    {
+        $payment = Payment::with([
+            'subscription.plan',
+            'subscription.user'
+        ])->findOrFail($id);
 
-    $khqr = new KhqrService();
-
-    $result = $khqr->checkTransaction(
-        $payment->transaction_id
-    );
-
-    if (
-        isset($result['data']['status']) &&
-        $result['data']['status'] === 'success'
-    ) {
-
-        $payment->update([
-            'status' => 'paid',
-            'payment_method' => 'bakong',
-            'paid_at' => now(),
-        ]);
-
-        $subscription = $payment->subscription;
-
-        if ($subscription->status !== 'active') {
-
-            $subscription->update([
-                'status' => 'active',
-                'start_date' => now(),
-                'end_date' => now()->addDays(
-                    $subscription->plan->duration_days
-                ),
-            ]);
+        // Ownership Check
+        if (
+            $payment->subscription->user_id !== auth()->id()
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
         }
-    }
 
-    return response()->json([
-        'success' => true,
-        'khqr_response' => $result,
-        'payment' => $payment->fresh(),
-        'subscription' => $payment->subscription->fresh(),
-    ]);
-}
+        $khqr = new KhqrService();
+
+        $result = $khqr->checkTransaction(
+            $payment->transaction_id
+        );
+
+        if (
+            isset($result['data']['status']) &&
+            $result['data']['status'] === 'success'
+        ) {
+
+            // Verify Amount
+            $paidAmount = (float) $result['data']['amount'];
+
+            if (
+                $paidAmount !== (float) $payment->amount
+            ) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Amount mismatch'
+                ], 400);
+            }
+
+            // Prevent double update
+            if ($payment->status !== 'paid') {
+
+                $payment->update([
+                    'status' => 'paid',
+                    'payment_method' => 'bakong',
+                    'paid_at' => now(),
+                ]);
+
+                $subscription = $payment->subscription;
+
+                if ($subscription->status !== 'active') {
+
+                    $subscription->update([
+                        'status' => 'active',
+                        'start_date' => now(),
+                        'end_date' => now()->addDays(
+                            $subscription->plan->duration_days
+                        ),
+                    ]);
+
+                    $user = $subscription->user;
+
+                    if (
+                        $user &&
+                        $user->role === 'user'
+                    ) {
+                        $user->update([
+                            'role' => 'recruiter'
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'khqr_response' => $result,
+            'payment' => $payment->fresh(),
+            'subscription' => $payment->subscription->fresh(),
+        ]);
+    }
 }

@@ -85,9 +85,7 @@ class AuthController extends Controller
             'otp' => $otp,
             'otp_expires_at' => Carbon::now()->addMinutes(5),
             'is_verified' => false,
-            'role' => $request->role === 'recruiter'
-                ? 'recruiter'
-                : 'user'
+            'role' => 'user'
         ]);
 
         // Send OTP

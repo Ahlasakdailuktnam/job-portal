@@ -10,15 +10,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/auth/google', [AuthController::class, 'google']);
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
 
-    Route::post('/payments', [PaymentController::class, 'store']);
-    Route::post(
-    '/payments/check/{id}',
-    [PaymentController::class, 'checkPayment']
-);
+   
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/ ', [AuthController::class, 'verifyOtp']);
+Route::post('/auth/verify-otp ', [AuthController::class, 'verifyOtp']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -45,6 +41,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //payment
     Route::get('/payments/{id}', [PaymentController::class, 'show']);
+    Route::post('/payments', [PaymentController::class, 'store']);
+    Route::post('/payments/check/{id}',[PaymentController::class, 'checkPayment']);
 
 
 });
