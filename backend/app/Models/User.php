@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Subscription;
+use App\Models\Cv;
 
 class User extends Authenticatable
 {
@@ -47,5 +48,13 @@ class User extends Authenticatable
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class);
+    }
+    public function cvs()
+    {
+        return $this->hasMany(Cv::class);
+    }
+    public function applications()
+    {
+        return $this->hasMany(JobApplication::class);
     }
 }
