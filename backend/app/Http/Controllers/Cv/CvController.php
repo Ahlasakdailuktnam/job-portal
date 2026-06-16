@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cv;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Controllers\Controller;
 use App\Models\Cv;
 use Illuminate\Http\Request;
@@ -110,5 +111,25 @@ class CvController extends Controller
             'success' => true,
             'message' => 'CV deleted successfully'
         ]);
+    }
+    public function download($id)
+    {
+        $cv = Cv::with([
+            'user',
+            'educations',
+            'experiences',
+            'skills'
+        ])
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
+
+        $pdf = Pdf::loadView(
+            'pdf.cv',
+            compact('cv')
+        );
+
+        return $pdf->download(
+            'cv-' . $cv->id . '.pdf'
+        );
     }
 }

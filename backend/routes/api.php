@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminJobController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\PlanController;
@@ -7,7 +9,11 @@ use App\Http\Controllers\Cv\CvController;
 use App\Http\Controllers\Cv\EducationController;
 use App\Http\Controllers\Cv\ExperienceController;
 use App\Http\Controllers\Cv\SkillController;
+use App\Http\Controllers\Dashboard\CompanyDashboardController;
 use App\Http\Controllers\Job\JobApplicationController;
+use App\Http\Controllers\Job\JobController;
+use App\Http\Controllers\Job\SavedJobController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\Subscription\SubscriptionController;
 use Illuminate\Support\Facades\Route;
@@ -16,7 +22,7 @@ Route::get('/auth/google', [AuthController::class, 'google']);
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/verify-otp ', [AuthController::class, 'verifyOtp']);
+Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -52,6 +58,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cvs/{id}', [CvController::class, 'show']);
     Route::put('/cvs/{id}', [CvController::class, 'update']);
     Route::delete('/cvs/{id}', [CvController::class, 'destroy']);
+    // Jobs
+    Route::get('/jobs', [JobController::class, 'index']);
+    Route::get('/jobs/{id}', [JobController::class, 'show']);
+
+    Route::post('/jobs', [JobController::class, 'store'])
+        ->middleware(['company.exists', 'active.subscription']);
+    Route::put('/jobs/{id}', [JobController::class, 'update'])
+        ->middleware('company.exists');
+    Route::delete('/jobs/{id}', [JobController::class, 'destroy'])
+        ->middleware('company.exists');
 
     //skills 
     Route::get('/cvs/{cvId}/skills', [SkillController::class, 'index']);
@@ -64,7 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cvs/{cvId}/experiences', [ExperienceController::class, 'store']);
     Route::put('/experiences/{id}', [ExperienceController::class, 'update']);
     Route::delete('/experiences/{id}', [ExperienceController::class, 'destroy']);
-    
+
     //educations
     Route::get('/cvs/{cvId}/educations', [EducationController::class, 'index']);
     Route::post('/cvs/{cvId}/educations', [EducationController::class, 'store']);
@@ -72,15 +88,68 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/educations/{id}', [EducationController::class, 'destroy']);
 
     //apply job
-    Route::post('/jobs/{jobId}/apply',[JobApplicationController::class, 'apply']);
+    Route::post('/jobs/{jobId}/apply', [JobApplicationController::class, 'apply']);
     //view all candidate apply to our job
     Route::get('/my-applications', [JobApplicationController::class, 'myApplications']);
+    Route::get('/company/applications', [JobApplicationController::class, 'companyApplications'])
+        ->middleware('company.exists');
+    Route::get('/applications/{id}', [JobApplicationController::class, 'show'])
+        ->middleware('company.exists');
+    Route::put('/applications/{id}', [JobApplicationController::class, 'updateStatus'])
+        ->middleware('company.exists');
+
+
+    Route::get(
+        '/company/dashboard',
+        [CompanyDashboardController::class, 'dashboard']
+    )->middleware('company.exists');
+
+
+    //save job
+    Route::post('/jobs/{id}/save', [SavedJobController::class, 'saveJob']);
+    Route::delete('/jobs/{id}/save', [SavedJobController::class, 'unsaveJob']);
+    Route::get('/saved-jobs', [SavedJobController::class, 'mySavedJobs']);
+
+    //download cv
+    Route::get(
+        '/cvs/{id}/download',
+        [CvController::class, 'download']
+    );
+    Route::get(
+        '/notifications',
+        [NotificationController::class, 'index']
+    );
+
+    Route::put(
+        '/notifications/{id}/read',
+        [NotificationController::class, 'markAsRead']
+    );
+
+    Route::get(
+        '/notifications/unread-count',
+        [NotificationController::class, 'unreadCount']
+    );
 });
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return response()->json([
-            'message' => 'Welcome Admin'
-        ]);
-    });
+
+    Route::get('/auth/getuser', [AuthController::class, 'getUser']);
+    Route::get(
+        '/admin/jobs/pending',
+        [AdminJobController::class, 'pendingJobs']
+    );
+
+    Route::put(
+        '/admin/jobs/{id}/approve',
+        [AdminJobController::class, 'approveJob']
+    );
+
+    Route::put(
+        '/admin/jobs/{id}/reject',
+        [AdminJobController::class, 'rejectJob']
+    );
+    Route::get(
+        '/admin/dashboard',
+        [AdminDashboardController::class, 'dashboard']
+    );
 });

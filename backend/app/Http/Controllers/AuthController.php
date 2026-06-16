@@ -212,4 +212,11 @@ public function logout(Request $request)
         'message' => 'Logout successful'
     ]);
 }
-}
+    public function getUser(){
+        $data= User::all();
+        return response()->json([
+            'data'=> $data,
+            'message'=> "get user successfully"
+        ]);
+    }
+    }

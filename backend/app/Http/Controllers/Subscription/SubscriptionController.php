@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Subscription;
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use App\Models\Subscription;
+use App\Services\TelegramService;
 use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
@@ -38,6 +39,13 @@ class SubscriptionController extends Controller
             'price' => $plan->price,
             'status' => 'pending',
         ]);
+        TelegramService::send(
+            env('TELEGRAM_ADMIN_CHAT_ID'),
+            "💰 New Subscription\n\n"
+                . "User: " . auth()->user()->name . "\n"
+                . "Plan: " . $plan->name . "\n"
+                . "Price: $" . $plan->price
+        );
 
         return response()->json([
             'success' => true,
@@ -69,7 +77,16 @@ class SubscriptionController extends Controller
             'status' => 'required|in:pending,active,expired,cancelled',
         ]);
 
-        $subscription->update($validated);
+        if ($validated['status'] === 'active') {
+
+            $subscription->update([
+                'status' => 'active',
+                'start_date' => now(),
+                'end_date' => now()->addDays(
+                    $subscription->plan->duration_days
+                )
+            ]);
+        }
 
         return response()->json([
             'success' => true,

@@ -57,4 +57,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(JobApplication::class);
     }
+    public function savedJobs()
+    {
+        return $this->hasMany(SavedJob::class);
+    }
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+    public function cvViews()
+    {
+        return $this->hasMany(RecruiterCvView::class);
+    }
 }
