@@ -114,13 +114,17 @@ class CvController extends Controller
     }
     public function download($id)
     {
+        $company = auth()->user()->company;
+
         $cv = Cv::with([
             'user',
             'educations',
             'experiences',
             'skills'
         ])
-            ->where('user_id', auth()->id())
+            ->whereHas('applications.job', function ($query) use ($company) {
+                $query->where('company_id', $company->id);
+            })
             ->findOrFail($id);
 
         $pdf = Pdf::loadView(

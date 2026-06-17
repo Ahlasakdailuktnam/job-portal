@@ -8,6 +8,7 @@ use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\Notification;
 use App\Models\RecruiterCvView;
+use App\Services\TelegramService;
 use Illuminate\Http\Request;
 
 class JobApplicationController extends Controller
@@ -75,6 +76,18 @@ class JobApplicationController extends Controller
             'applied_at' => now()
         ]);
 
+        $recruiter = $job->company?->user;
+
+        if (
+            $recruiter?->telegram_notifications &&
+            $recruiter?->telegram_chat_id
+        ) {
+            TelegramService::send(
+                $recruiter->telegram_chat_id,
+                "New application received\n\nJob: {$job->title}"
+            );
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Applied successfully',
@@ -116,6 +129,13 @@ class JobApplicationController extends Controller
             })
             ->latest()
             ->paginate(10);
+
+        if (!$this->hasActiveSubscription()) {
+            $applications->getCollection()->transform(function ($application) {
+                return $this->hideCandidateContact($application);
+            });
+        }
+
         return response()->json([
             'success' => true,
             'data' => $applications
@@ -146,6 +166,11 @@ class JobApplicationController extends Controller
                 'message' => 'Application not found'
             ], 404);
         }
+
+        if (!$this->hasActiveSubscription()) {
+            $application = $this->hideCandidateContact($application);
+        }
+
         $subscription = auth()->user()
             ->subscriptions()
             ->with('plan')
@@ -236,10 +261,54 @@ class JobApplicationController extends Controller
             'message' => 'Your application has been ' . $validated['status']
         ]);
 
+        $application->load('job.company.user');
+        $recruiter = $application->job->company->user;
+
+        if (
+            $recruiter?->telegram_notifications &&
+            $recruiter?->telegram_chat_id
+        ) {
+            TelegramService::send(
+                $recruiter->telegram_chat_id,
+                "Application status updated\n\nStatus: {$validated['status']}"
+            );
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Application status updated successfully',
             'data' => $application
         ]);
+    }
+
+    private function hasActiveSubscription(): bool
+    {
+        return auth()->user()
+            ->subscriptions()
+            ->where('status', 'active')
+            ->whereNotNull('end_date')
+            ->where('end_date', '>=', now())
+            ->exists();
+    }
+
+    private function hideCandidateContact(JobApplication $application): JobApplication
+    {
+        if ($application->relationLoaded('user') && $application->user) {
+            $application->user->makeHidden([
+                'email',
+            ]);
+        }
+
+        if ($application->relationLoaded('cv') && $application->cv) {
+            $application->cv->makeHidden([
+                'phone',
+                'address',
+                'linkedin',
+                'telegram',
+                'cv_file',
+            ]);
+        }
+
+        return $application;
     }
 }

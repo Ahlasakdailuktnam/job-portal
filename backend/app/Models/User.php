@@ -22,6 +22,8 @@ class User extends Authenticatable
         'is_verified',
         'role',
         'google_id',
+        'telegram_chat_id',
+        'telegram_notifications',
     ];
 
 
@@ -38,6 +40,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'otp_expires_at' => 'datetime',
             'is_verified' => 'boolean',
+            'telegram_notifications' => 'boolean',
             'password' => 'hashed',
         ];
     }

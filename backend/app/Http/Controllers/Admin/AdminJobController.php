@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Job;
 use App\Models\Notification;
+use App\Services\TelegramService;
 use Illuminate\Http\Request;
 
 class AdminJobController extends Controller
@@ -50,6 +51,18 @@ class AdminJobController extends Controller
             'message' => "Your job '{$job->title}' has been approved"
         ]);
 
+        $recruiter = $job->company->user;
+
+        if (
+            $recruiter?->telegram_notifications &&
+            $recruiter?->telegram_chat_id
+        ) {
+            TelegramService::send(
+                $recruiter->telegram_chat_id,
+                "Job approved\n\nJob: {$job->title}"
+            );
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Job approved successfully',
@@ -80,6 +93,18 @@ class AdminJobController extends Controller
             'title' => 'Job Rejected',
             'message' => "Your job '{$job->title}' has been rejected"
         ]);
+
+        $recruiter = $job->company->user;
+
+        if (
+            $recruiter?->telegram_notifications &&
+            $recruiter?->telegram_chat_id
+        ) {
+            TelegramService::send(
+                $recruiter->telegram_chat_id,
+                "Job rejected\n\nJob: {$job->title}"
+            );
+        }
 
         return response()->json([
             'success' => true,

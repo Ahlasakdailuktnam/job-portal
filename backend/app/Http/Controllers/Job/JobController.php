@@ -13,16 +13,6 @@ class JobController extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
-
-        // Check role
-        if ($user->role !== 'recruiter') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Only recruiters can create jobs'
-            ], 403);
-        }
-
-        // Check company
         $company = $user->company;
 
         // Get active subscription for the plan job limit
@@ -162,6 +152,25 @@ class JobController extends Controller
         ]);
     }
 
+    public function myJobs(Request $request)
+    {
+        $company = auth()->user()->company;
+
+        $jobs = $company->jobs()
+            ->with('category')
+            ->withCount('applications')
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $query->where('status', $request->status);
+            })
+            ->latest()
+            ->paginate($request->integer('per_page', 10));
+
+        return response()->json([
+            'success' => true,
+            'data' => $jobs
+        ]);
+    }
+
     // UPDATE JOB
     public function update(Request $request, $id)
     {
@@ -212,5 +221,58 @@ class JobController extends Controller
             'success' => true,
             'message' => 'Job deleted successfully'
         ]);
+    }
+
+    public function close($id)
+    {
+        $job = $this->findCompanyJob($id);
+
+        if ($job->status === 'closed') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Job is already closed'
+            ], 400);
+        }
+
+        $job->update([
+            'status' => 'closed'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Job closed successfully',
+            'data' => $job->fresh()
+        ]);
+    }
+
+    public function reopen($id)
+    {
+        $job = $this->findCompanyJob($id);
+
+        if ($job->status === 'active') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Job is already active'
+            ], 400);
+        }
+
+        $job->update([
+            'status' => 'active'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Job reopened successfully',
+            'data' => $job->fresh()
+        ]);
+    }
+
+    private function findCompanyJob($id): Job
+    {
+        $company = auth()->user()->company;
+
+        return Job::where('id', $id)
+            ->where('company_id', $company->id)
+            ->firstOrFail();
     }
 }

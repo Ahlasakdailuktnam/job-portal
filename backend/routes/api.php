@@ -11,145 +11,214 @@ use App\Http\Controllers\Cv\ExperienceController;
 use App\Http\Controllers\Cv\SkillController;
 use App\Http\Controllers\Dashboard\CompanyDashboardController;
 use App\Http\Controllers\Job\JobApplicationController;
+use App\Http\Controllers\Job\JobCategoryController;
 use App\Http\Controllers\Job\JobController;
 use App\Http\Controllers\Job\SavedJobController;
-use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Notification\NotificationController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\Subscription\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/auth/google', [AuthController::class, 'google']);
-Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp']);
+/*
+|--------------------------------------------------------------------------
+| Public routes
+|--------------------------------------------------------------------------
+*/
 
-Route::middleware('auth:sanctum')->group(function () {
-
-    Route::post('/auth/logout', [AuthController::class, 'logout']);
-    //company
-    Route::post('/companies', [CompanyController::class, 'store']);
-    Route::get('/companies/{id}', [CompanyController::class, 'show']);
-    Route::put('/companies/{id}', [CompanyController::class, 'update']);
-    Route::delete('/companies/{id}', [CompanyController::class, 'destroy']);
-
-    //plans
-    Route::get('/plans', [PlanController::class, 'index']);
-    Route::post('/plans', [PlanController::class, 'store']);
-    Route::get('/plans/{id}', [PlanController::class, 'show']);
-    Route::put('/plans/{id}', [PlanController::class, 'update']);
-    Route::delete('/plans/{id}', [PlanController::class, 'destroy']);
-
-    //subscription
-    Route::get('/subscriptions', [SubscriptionController::class, 'index']);
-    Route::post('/subscriptions', [SubscriptionController::class, 'store']);
-    Route::get('/subscriptions/{id}', [SubscriptionController::class, 'show']);
-    Route::put('/subscriptions/{id}', [SubscriptionController::class, 'update']);
-    Route::delete('/subscriptions/{id}', [SubscriptionController::class, 'destroy']);
-
-    //payment
-    Route::get('/payments/{id}', [PaymentController::class, 'show']);
-    Route::post('/payments', [PaymentController::class, 'store']);
-    Route::post('/payments/check/{id}', [PaymentController::class, 'checkPayment']);
-
-    // CV
-    Route::get('/cvs', [CvController::class, 'index']);
-    Route::post('/cvs', [CvController::class, 'store']);
-    Route::get('/cvs/{id}', [CvController::class, 'show']);
-    Route::put('/cvs/{id}', [CvController::class, 'update']);
-    Route::delete('/cvs/{id}', [CvController::class, 'destroy']);
-    // Jobs
-    Route::get('/jobs', [JobController::class, 'index']);
-    Route::get('/jobs/{id}', [JobController::class, 'show']);
-
-    Route::post('/jobs', [JobController::class, 'store'])
-        ->middleware(['company.exists', 'active.subscription']);
-    Route::put('/jobs/{id}', [JobController::class, 'update'])
-        ->middleware('company.exists');
-    Route::delete('/jobs/{id}', [JobController::class, 'destroy'])
-        ->middleware('company.exists');
-
-    //skills 
-    Route::get('/cvs/{cvId}/skills', [SkillController::class, 'index']);
-    Route::post('/cvs/{cvId}/skills', [SkillController::class, 'store']);
-    Route::put('/skills/{id}', [SkillController::class, 'update']);
-    Route::delete('/skills/{id}', [SkillController::class, 'destroy']);
-
-    //exerpience
-    Route::get('/cvs/{cvId}/experiences', [ExperienceController::class, 'index']);
-    Route::post('/cvs/{cvId}/experiences', [ExperienceController::class, 'store']);
-    Route::put('/experiences/{id}', [ExperienceController::class, 'update']);
-    Route::delete('/experiences/{id}', [ExperienceController::class, 'destroy']);
-
-    //educations
-    Route::get('/cvs/{cvId}/educations', [EducationController::class, 'index']);
-    Route::post('/cvs/{cvId}/educations', [EducationController::class, 'store']);
-    Route::put('/educations/{id}', [EducationController::class, 'update']);
-    Route::delete('/educations/{id}', [EducationController::class, 'destroy']);
-
-    //apply job
-    Route::post('/jobs/{jobId}/apply', [JobApplicationController::class, 'apply']);
-    //view all candidate apply to our job
-    Route::get('/my-applications', [JobApplicationController::class, 'myApplications']);
-    Route::get('/company/applications', [JobApplicationController::class, 'companyApplications'])
-        ->middleware('company.exists');
-    Route::get('/applications/{id}', [JobApplicationController::class, 'show'])
-        ->middleware('company.exists');
-    Route::put('/applications/{id}', [JobApplicationController::class, 'updateStatus'])
-        ->middleware('company.exists');
-
-
-    Route::get(
-        '/company/dashboard',
-        [CompanyDashboardController::class, 'dashboard']
-    )->middleware('company.exists');
-
-
-    //save job
-    Route::post('/jobs/{id}/save', [SavedJobController::class, 'saveJob']);
-    Route::delete('/jobs/{id}/save', [SavedJobController::class, 'unsaveJob']);
-    Route::get('/saved-jobs', [SavedJobController::class, 'mySavedJobs']);
-
-    //download cv
-    Route::get(
-        '/cvs/{id}/download',
-        [CvController::class, 'download']
-    );
-    Route::get(
-        '/notifications',
-        [NotificationController::class, 'index']
-    );
-
-    Route::put(
-        '/notifications/{id}/read',
-        [NotificationController::class, 'markAsRead']
-    );
-
-    Route::get(
-        '/notifications/unread-count',
-        [NotificationController::class, 'unreadCount']
-    );
+Route::prefix('auth')->controller(AuthController::class)->group(function () {
+    Route::get('/google', 'google');
+    Route::get('/google/callback', 'googleCallback');
+    Route::post('/register', 'register');
+    Route::post('/login', 'login');
+    Route::post('/verify-otp', 'verifyOtp');
+});
+ Route::controller(PlanController::class)->group(function () {
+        Route::get('/plans', 'index');
+        Route::get('/plans/{id}', 'show');
 });
 
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
-    Route::get('/auth/getuser', [AuthController::class, 'getUser']);
-    Route::get(
-        '/admin/jobs/pending',
-        [AdminJobController::class, 'pendingJobs']
-    );
+/*
+|--------------------------------------------------------------------------
+| Authenticated user routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('auth')->controller(AuthController::class)->group(function () {
+        Route::post('/logout', 'logout');
+    });
 
-    Route::put(
-        '/admin/jobs/{id}/approve',
-        [AdminJobController::class, 'approveJob']
-    );
+   
+    Route::controller(SubscriptionController::class)->group(function () {
+        Route::post('/subscriptions', 'store');
+        Route::get('/subscriptions/{id}', 'show');
+    });
 
-    Route::put(
-        '/admin/jobs/{id}/reject',
-        [AdminJobController::class, 'rejectJob']
-    );
-    Route::get(
-        '/admin/dashboard',
-        [AdminDashboardController::class, 'dashboard']
-    );
+    Route::controller(PaymentController::class)->group(function () {
+        Route::get('/payments/{id}', 'show');
+        Route::post('/payments', 'store');
+        Route::post('/payments/check/{id}', 'checkPayment');
+    });
+
+    Route::controller(CvController::class)->group(function () {
+        Route::get('/cvs', 'index');
+        Route::post('/cvs', 'store');
+        Route::get('/cvs/{id}', 'show');
+        Route::put('/cvs/{id}', 'update');
+        Route::delete('/cvs/{id}', 'destroy');
+        Route::get('/cvs/{id}/download', 'download');
+    });
+
+    Route::controller(SkillController::class)->group(function () {
+        Route::get('/cvs/{cvId}/skills', 'index');
+        Route::post('/cvs/{cvId}/skills', 'store');
+        Route::put('/skills/{id}', 'update');
+        Route::delete('/skills/{id}', 'destroy');
+    });
+
+    Route::controller(ExperienceController::class)->group(function () {
+        Route::get('/cvs/{cvId}/experiences', 'index');
+        Route::post('/cvs/{cvId}/experiences', 'store');
+        Route::put('/experiences/{id}', 'update');
+        Route::delete('/experiences/{id}', 'destroy');
+    });
+
+    Route::controller(EducationController::class)->group(function () {
+        Route::get('/cvs/{cvId}/educations', 'index');
+        Route::post('/cvs/{cvId}/educations', 'store');
+        Route::put('/educations/{id}', 'update');
+        Route::delete('/educations/{id}', 'destroy');
+    });
+
+    Route::controller(JobController::class)->group(function () {
+        Route::get('/jobs', 'index');
+        Route::get('/jobs/{id}', 'show');
+    });
+
+    Route::controller(JobApplicationController::class)->group(function () {
+        Route::post('/jobs/{jobId}/apply', 'apply');
+        Route::get('/my-applications', 'myApplications');
+    });
+
+    Route::controller(SavedJobController::class)->group(function () {
+        Route::post('/jobs/{id}/save', 'saveJob');
+        Route::delete('/jobs/{id}/save', 'unsaveJob');
+        Route::get('/saved-jobs', 'mySavedJobs');
+    });
+
+    Route::controller(NotificationController::class)->group(function () {
+        Route::get('/notifications', 'index');
+        Route::put('/notifications/{id}/read', 'markAsRead');
+        Route::get('/notifications/unread-count', 'unreadCount');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Recruiter routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware([
+    'auth:sanctum',
+    'recruiter',
+])->group(function () {
+    Route::controller(CompanyController::class)->group(function () {
+        Route::post('/companies', 'store');
+        Route::get('/companies/{id}', 'show');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Recruiter + company routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware([
+    'auth:sanctum',
+    'recruiter',
+    'company.exists',
+])->group(function () {
+    Route::controller(CompanyController::class)->group(function () {
+        Route::put('/companies/{id}', 'update');
+        Route::delete('/companies/{id}', 'destroy');
+    });
+
+    Route::controller(JobController::class)->group(function () {
+        Route::put('/jobs/{id}', 'update');
+        Route::delete('/jobs/{id}', 'destroy');
+    });
+
+    Route::controller(JobApplicationController::class)->group(function () {
+        Route::get('/company/applications', 'companyApplications');
+        Route::get('/applications/{id}', 'show');
+        Route::put('/applications/{id}', 'updateStatus');
+    });
+
+    Route::get('/company/dashboard', [
+        CompanyDashboardController::class,
+        'dashboard',
+    ]);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Premium recruiter routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware([
+    'auth:sanctum',
+    'recruiter',
+    'company.exists',
+    'active.subscription',
+])->group(function () {
+    Route::controller(JobController::class)->group(function () {
+        Route::post('/jobs', 'store');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware([
+    'auth:sanctum',
+    'admin',
+])->group(function () {
+    Route::prefix('auth')->controller(AuthController::class)->group(function () {
+        Route::get('/getuser', 'getUser');
+    });
+    Route::controller(JobCategoryController::class)->group(function () {
+
+        Route::get('/job-categories', 'index');
+        Route::post('/job-categories', 'store');
+
+        Route::get('/job-categories/{id}', 'show');
+        Route::put('/job-categories/{id}', 'update');
+        Route::delete('/job-categories/{id}', 'destroy');
+    });
+    Route::controller(PlanController::class)->group(function () {
+        Route::post('/plans', 'store');
+        Route::put('/plans/{id}', 'update');
+        Route::delete('/plans/{id}', 'destroy');
+    });
+
+    Route::controller(SubscriptionController::class)->group(function () {
+        Route::get('/subscriptions', 'index');
+        Route::put('/subscriptions/{id}', 'update');
+        Route::delete('/subscriptions/{id}', 'destroy');
+    });
+
+    Route::prefix('admin')->group(function () {
+        Route::prefix('jobs')->controller(AdminJobController::class)->group(function () {
+            Route::get('/pending', 'pendingJobs');
+            Route::put('/{id}/approve', 'approveJob');
+            Route::put('/{id}/reject', 'rejectJob');
+        });
+
+        Route::get('/dashboard', [
+            AdminDashboardController::class,
+            'dashboard',
+        ]);  
+    });
 });

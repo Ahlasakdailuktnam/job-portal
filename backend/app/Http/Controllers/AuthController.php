@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Mail\SendOtpMail;
 use App\Models\User;
 use Carbon\Carbon;
@@ -145,6 +147,61 @@ class AuthController extends Controller
             'user' => $user
         ]);
     }
+
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        $user = User::where('email', $request->email)->firstOrFail();
+        $otp = rand(100000, 999999);
+
+        $user->update([
+            'otp' => $otp,
+            'otp_expires_at' => Carbon::now()->addMinutes(5),
+        ]);
+
+        Mail::to($user->email)->send(new SendOtpMail($otp));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password reset OTP sent to email',
+            'email' => $user->email,
+        ]);
+    }
+
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        $user = User::where('email', $request->email)->firstOrFail();
+
+        if ($user->otp != $request->otp) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid OTP',
+            ], 400);
+        }
+
+        if (
+            !$user->otp_expires_at ||
+            Carbon::now()->gt($user->otp_expires_at)
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP expired',
+            ], 400);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password),
+            'otp' => null,
+            'otp_expires_at' => null,
+        ]);
+
+        $user->tokens()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password reset successfully',
+        ]);
+    }
+
     public function login(Request $request)
 {
     $request->validate([
