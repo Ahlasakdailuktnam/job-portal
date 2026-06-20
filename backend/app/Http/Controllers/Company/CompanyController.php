@@ -36,17 +36,22 @@ class CompanyController extends Controller
 
         $validated = $request->validate([
             'company_name' => 'required|string|max:255',
-            'logo' => 'nullable|string',
+            'logo' => 'nullable|image',
             'description' => 'nullable|string',
             'social' => 'nullable|string',
             'contact_tlg' => 'nullable|string',
             'address' => 'nullable|string',
         ]);
 
-        $company = Company::create([
-            'user_id' => auth()->id(),
-            ...$validated
-        ]);
+        if ($request->hasFile('logo')) {
+            $validated['logo'] = $request
+                ->file('logo')
+                ->store('companies', 'public');
+        }
+
+        $validated['user_id'] = auth()->id();
+
+        $company = Company::create($validated);
 
         return response()->json([
             'success' => true,
@@ -72,11 +77,11 @@ class CompanyController extends Controller
             'id',
             $id
         )
-        ->where(
-            'user_id',
-            auth()->id()
-        )
-        ->firstOrFail();
+            ->where(
+                'user_id',
+                auth()->id()
+            )
+            ->firstOrFail();
 
         $validated = $request->validate([
             'company_name' => 'sometimes|string|max:255',
@@ -102,17 +107,31 @@ class CompanyController extends Controller
             'id',
             $id
         )
-        ->where(
-            'user_id',
-            auth()->id()
-        )
-        ->firstOrFail();
+            ->where(
+                'user_id',
+                auth()->id()
+            )
+            ->firstOrFail();
 
         $company->delete();
 
         return response()->json([
             'success' => true,
             'message' => 'Company deleted successfully'
+        ]);
+    }
+    public function myCompany()
+    {
+        $company = Company::with([
+            'user:id,name,email'
+        ])
+            ->where('user_id', auth()->id())
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'has_company' => !!$company,
+            'data' => $company
         ]);
     }
 }

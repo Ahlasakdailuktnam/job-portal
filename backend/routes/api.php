@@ -123,6 +123,7 @@ Route::middleware([
     'recruiter',
 ])->group(function () {
     Route::controller(CompanyController::class)->group(function () {
+          Route::get('/my-company', 'myCompany');
         Route::post('/companies', 'store');
         Route::get('/companies/{id}', 'show');
     });
