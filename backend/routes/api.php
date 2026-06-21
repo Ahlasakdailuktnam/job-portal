@@ -32,6 +32,10 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
     Route::post('/login', 'login');
     Route::post('/verify-otp', 'verifyOtp');
 });
+Route::match(['get', 'post'], '/payments/callback', [
+    PaymentController::class,
+    'callback',
+]);
  Route::controller(PlanController::class)->group(function () {
         Route::get('/plans', 'index');
         Route::get('/plans/{id}', 'show');

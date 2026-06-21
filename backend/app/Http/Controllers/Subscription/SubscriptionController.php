@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Subscription;
 
 use App\Http\Controllers\Controller;
-use App\Models\Plan;
 use App\Models\Subscription;
-use App\Services\TelegramService;
 use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
@@ -27,31 +25,14 @@ class SubscriptionController extends Controller
     // CREATE SUBSCRIPTION
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'plan_id' => 'required|exists:plans,id',
         ]);
 
-        $plan = Plan::findOrFail($validated['plan_id']);
-
-        $subscription = Subscription::create([
-            'user_id' => auth()->id(),
-            'plan_id' => $plan->id,
-            'price' => $plan->price,
-            'status' => 'pending',
-        ]);
-        TelegramService::send(
-            env('TELEGRAM_ADMIN_CHAT_ID'),
-            "💰 New Subscription\n\n"
-                . "User: " . auth()->user()->name . "\n"
-                . "Plan: " . $plan->name . "\n"
-                . "Price: $" . $plan->price
-        );
-
         return response()->json([
-            'success' => true,
-            'message' => 'Subscription created successfully',
-            'data' => $subscription
-        ], 201);
+            'success' => false,
+            'message' => 'Start checkout with /payments. Subscription is saved only after payment is paid.',
+        ], 400);
     }
 
     // GET SINGLE SUBSCRIPTION

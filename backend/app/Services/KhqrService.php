@@ -15,7 +15,12 @@ class KhqrService
         $profileId = env('KHQR_PROFILE_ID');
         $secretKey = env('KHQR_SECRET_KEY');
 
-        $successUrl = env('APP_URL') . '/api/payments/callback';
+        $successUrl = rtrim(
+            env('FRONTEND_URL', 'http://localhost:5173'),
+            '/'
+        ) . '/payment-success?' . http_build_query([
+            'transaction_id' => $transactionId,
+        ]);
 
         $formattedAmount = number_format($amount, 2, '.', '');
 
