@@ -50,6 +50,7 @@ Route::match(['get', 'post'], '/payments/callback', [
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->controller(AuthController::class)->group(function () {
         Route::post('/logout', 'logout');
+        Route::get('/me', 'me');
     });
 
    

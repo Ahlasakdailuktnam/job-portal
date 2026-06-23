@@ -17,15 +17,15 @@ class AuthController extends Controller
 {
     // GOOGLE LOGIN
 
-   public function google()
-{
-    return Socialite::driver('google')
-        ->stateless()
-        ->with([
-            'prompt' => 'select_account'
-        ])
-        ->redirect();
-}
+    public function google()
+    {
+        return Socialite::driver('google')
+            ->stateless()
+            ->with([
+                'prompt' => 'select_account'
+            ])
+            ->redirect();
+    }
 
     public function googleCallback()
     {
@@ -62,8 +62,9 @@ class AuthController extends Controller
         // Send OTP Email
         Mail::to($user->email)->send(new SendOtpMail($otp));
 
-       return redirect(
-        'http://localhost:5173/otp?email=' . $user->email);
+        return redirect(
+            'http://localhost:5173/otp?email=' . $user->email
+        );
     }
 
     // REGISTER
@@ -203,77 +204,84 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required'
-    ]);
-
-    // Find user
-    $user = User::where('email', $request->email)->first();
-
-    // Check user exists
-    if (!$user) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Email not found'
-        ], 404);
-    }
-
-    // Check password
-    if (!Hash::check($request->password, $user->password)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Wrong password'
-        ], 401);
-    }
-
-    // Check verified
-    if (!$user->is_verified) {
-
-        // Generate new OTP
-        $otp = rand(100000, 999999);
-
-        $user->update([
-            'otp' => $otp,
-            'otp_expires_at' => Carbon::now()->addMinutes(5)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
         ]);
 
-        // Send OTP email
-        Mail::to($user->email)->send(new SendOtpMail($otp));
+        // Find user
+        $user = User::where('email', $request->email)->first();
+
+        // Check user exists
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email not found'
+            ], 404);
+        }
+
+        // Check password
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Wrong password'
+            ], 401);
+        }
+
+        // Check verified
+        if (!$user->is_verified) {
+
+            // Generate new OTP
+            $otp = rand(100000, 999999);
+
+            $user->update([
+                'otp' => $otp,
+                'otp_expires_at' => Carbon::now()->addMinutes(5)
+            ]);
+
+            // Send OTP email
+            Mail::to($user->email)->send(new SendOtpMail($otp));
+
+            return response()->json([
+                'success' => true,
+                'requires_otp' => true,
+                'message' => 'OTP sent to email',
+                'email' => $user->email
+            ]);
+        }
+
+        // Create token
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'success' => true,
-            'requires_otp' => true,
-            'message' => 'OTP sent to email',
-            'email' => $user->email
+            'message' => 'Login successful',
+            'token' => $token,
+            'user' => $user
         ]);
     }
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
 
-    // Create token
-    $token = $user->createToken('auth_token')->plainTextToken;
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Login successful',
-        'token' => $token,
-        'user' => $user
-    ]);
-}
-public function logout(Request $request)
-{
-    $request->user()->currentAccessToken()->delete();
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Logout successful'
-    ]);
-}
-    public function getUser(){
-        $data= User::all();
         return response()->json([
-            'data'=> $data,
-            'message'=> "get user successfully"
+            'success' => true,
+            'message' => 'Logout successful'
         ]);
     }
+    public function getUser()
+    {
+        $data = User::all();
+        return response()->json([
+            'data' => $data,
+            'message' => "get user successfully"
+        ]);
     }
+    public function me(Request $request)
+    {
+        return response()->json([
+            'user' => $request->user()
+        ]);
+    }
+}
