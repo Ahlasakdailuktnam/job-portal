@@ -1,12 +1,10 @@
 <?php
 
 namespace App\Http\Controllers\Job;
-
 use App\Http\Controllers\Controller;
 use App\Models\JobCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-
 class JobCategoryController extends Controller
 {
     public function index()
@@ -16,7 +14,6 @@ class JobCategoryController extends Controller
             'data' => JobCategory::latest()->get()
         ]);
     }
-
     public function store(Request $request)
     {
         $validated = $request->validate([

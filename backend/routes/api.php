@@ -36,13 +36,13 @@ Route::match(['get', 'post'], '/payments/callback', [
     PaymentController::class,
     'callback',
 ]);
- Route::controller(PlanController::class)->group(function () {
-        Route::get('/plans', 'index');
-        Route::get('/plans/{id}', 'show');
+Route::controller(PlanController::class)->group(function () {
+    Route::get('/plans', 'index');
+    Route::get('/plans/{id}', 'show');
 });
 
 
-/*
+/*    
 |--------------------------------------------------------------------------
 | Authenticated user routes
 |--------------------------------------------------------------------------
@@ -53,7 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', 'me');
     });
 
-   
+    Route::get('/job-categories', [JobCategoryController::class, 'index']);
     Route::controller(SubscriptionController::class)->group(function () {
         Route::post('/subscriptions', 'store');
         Route::get('/subscriptions/{id}', 'show');
@@ -128,7 +128,7 @@ Route::middleware([
     'recruiter',
 ])->group(function () {
     Route::controller(CompanyController::class)->group(function () {
-          Route::get('/my-company', 'myCompany');
+        Route::get('/my-company', 'myCompany');
         Route::post('/companies', 'store');
         Route::get('/companies/{id}', 'show');
     });
@@ -196,7 +196,6 @@ Route::middleware([
     });
     Route::controller(JobCategoryController::class)->group(function () {
 
-        Route::get('/job-categories', 'index');
         Route::post('/job-categories', 'store');
 
         Route::get('/job-categories/{id}', 'show');
@@ -225,6 +224,6 @@ Route::middleware([
         Route::get('/dashboard', [
             AdminDashboardController::class,
             'dashboard',
-        ]);  
+        ]);
     });
 });
