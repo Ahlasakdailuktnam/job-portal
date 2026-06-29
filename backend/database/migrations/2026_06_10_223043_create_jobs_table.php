@@ -63,6 +63,7 @@ return new class extends Migration
             $table->date('deadline');
 
             $table->enum('status', [
+                'draft',
                 'pending',
                 'active',
                 'rejected',

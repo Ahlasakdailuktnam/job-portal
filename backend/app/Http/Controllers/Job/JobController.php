@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Job;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\JobFilterRequest;
 use App\Models\Job;
 use App\Services\TelegramService;
 use Illuminate\Http\Request;
@@ -15,30 +16,11 @@ class JobController extends Controller
         $user = auth()->user();
         $company = $user->company;
 
-        // Get active subscription for the plan job limit
-        $subscription = $user->subscriptions()
-            ->with('plan')
-            ->where('status', 'active')
-            ->latest()
-            ->first();
-
-        // Check job limit
-        $currentJobs = $company->jobs()
-            ->whereIn('status', [
-                'pending',
-                'active'
-            ])
-            ->count();
-        $jobLimit = $subscription->plan->job_limit;
-
-        if (
-            $jobLimit != -1 &&
-            $currentJobs >= $jobLimit
-        ) {
+        if (!$company) {
             return response()->json([
                 'success' => false,
-                'message' => 'Job limit reached for your plan'
-            ], 403);
+                'message' => 'Company profile not found'
+            ], 404);
         }
 
         $validated = $request->validate([
@@ -56,85 +38,94 @@ class JobController extends Controller
             'available_position' => 'required|integer|min:1',
             'language' => 'nullable|string|max:255',
             'deadline' => 'required|date',
-
+            'status' => 'nullable|in:draft,pending,active,rejected,closed',
         ]);
-        $validated['status'] = 'pending';
-        $job = $company->jobs()->create($validated);
-        TelegramService::send(
-            env('TELEGRAM_ADMIN_CHAT_ID'),
-            "📢 New Job Pending Approval\n\n"
-                . "Company: " . $company->company_name . "\n"
-                . "Job: " . $job->title
+
+        // Default = draft
+        $validated['status'] = $request->input(
+            'status',
+            'draft'
         );
+
+
+        if ($validated['status'] === 'pending') {
+
+            $subscription = $user->subscriptions()
+                ->with('plan')
+                ->where('status', 'active')
+                ->latest()
+                ->first();
+
+            if (!$subscription) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No active subscription found'
+                ], 403);
+            }
+
+            $currentJobs = $company->jobs()
+                ->whereIn('status', [
+                    'pending',
+                    'active'
+                ])
+                ->count();
+
+            $jobLimit = $subscription->plan->job_limit;
+
+            if (
+                $jobLimit != -1 &&
+                $currentJobs >= $jobLimit
+            ) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Job limit reached for your plan'
+                ], 403);
+            }
+        }
+
+
+        $job = $company->jobs()->create($validated);
+
+
+        if ($validated['status'] === 'pending') {
+
+            TelegramService::send(
+                env('TELEGRAM_ADMIN_CHAT_ID'),
+                "📢 New Job Pending Approval\n\n"
+                    . "Company: {$company->company_name}\n"
+                    . "Job: {$job->title}"
+            );
+        }
 
         return response()->json([
             'success' => true,
-            'message' => 'Job created successfully',
-            'data' => $job
+            'message' => $validated['status'] === 'draft'
+                ? 'Draft saved successfully'
+                : 'Job submitted successfully',
+            'data' => $job->load([
+                'company',
+                'category'
+            ])
         ], 201);
     }
 
-    // GET ALL JOBS
-    public function index(Request $request)
-    {
-        $jobs = Job::with([
+   public function index(JobFilterRequest $request)
+{
+    $jobs = Job::query()
+        ->with([
             'company',
             'category'
         ])
-            ->where('status', 'active');
+        ->active()
+        ->filter($request->validated())
+        ->latest()
+        ->paginate(10);
 
-        // Search by title
-        if ($request->filled('keyword')) {
-            $jobs->where(
-                'title',
-                'like',
-                '%' . $request->keyword . '%'
-            );
-        }
-
-        // Filter by category
-        if ($request->filled('category')) {
-            $jobs->where(
-                'category_id',
-                $request->category
-            );
-        }
-
-        // Filter by job type
-        if ($request->filled('job_type')) {
-            $jobs->where(
-                'job_type',
-                $request->job_type
-            );
-        }
-
-        // Salary min
-        if ($request->filled('salary_min')) {
-            $jobs->where(
-                'salary_min',
-                '>=',
-                $request->salary_min
-            );
-        }
-
-        // Salary max
-        if ($request->filled('salary_max')) {
-            $jobs->where(
-                'salary_max',
-                '<=',
-                $request->salary_max
-            );
-        }
-
-        $jobs = $jobs
-            ->latest()
-            ->paginate(10);
-
-        return response()->json([
-            'success' => true,
-            'data' => $jobs
-        ]);
-    }
+    return response()->json([
+        'success' => true,
+        'data' => $jobs
+    ]);
+}
 
     // GET SINGLE JOB
     public function show($id)
@@ -151,7 +142,22 @@ class JobController extends Controller
             'data' => $job
         ]);
     }
+    public function showMyJob($id)
+    {
+        $company = auth()->user()->company;
 
+        $job = Job::with([
+            'company',
+            'category'
+        ])
+            ->where('company_id', $company->id)
+            ->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $job
+        ]);
+    }
     public function myJobs(Request $request)
     {
         $company = auth()->user()->company;
@@ -195,8 +201,11 @@ class JobController extends Controller
             'available_position' => 'nullable|integer|min:1',
             'language' => 'nullable|string|max:255',
             'deadline' => 'nullable|date',
+            'status' => 'nullable|in:draft,pending,active,rejected,closed'
         ]);
-        $validated['status'] = 'pending';
+        if ($request->has('status')) {
+            $validated['status'] = $request->status;
+        }
         $job->update($validated);
 
         return response()->json([

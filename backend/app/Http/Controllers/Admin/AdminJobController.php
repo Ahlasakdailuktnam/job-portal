@@ -17,9 +17,9 @@ class AdminJobController extends Controller
             'company',
             'category'
         ])
-        ->where('status', 'pending')
-        ->latest()
-        ->paginate(10);
+            ->where('status', 'pending')
+            ->latest()
+            ->paginate(10);
 
         return response()->json([
             'success' => true,
@@ -111,5 +111,35 @@ class AdminJobController extends Controller
             'message' => 'Job rejected successfully',
             'data' => $job->fresh()
         ]);
+    }
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'company_id' => 'required|exists:companies,id',
+            'category_id' => 'required|exists:job_categories,id',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'requirement' => 'nullable|string',
+            'responsibility' => 'nullable|string',
+            'salary_min' => 'nullable|numeric',
+            'salary_max' => 'nullable|numeric',
+            'job_type' => 'required|in:full_time,part_time,remote,internship',
+            'job_level' => 'nullable|string|max:100',
+            'experience' => 'nullable|string|max:100',
+            'qualification' => 'nullable|string|max:255',
+            'available_position' => 'required|integer|min:1',
+            'language' => 'nullable|string|max:255',
+            'deadline' => 'required|date',
+        ]);
+
+        $validated['status'] = 'active';
+
+        $job = Job::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Job created successfully',
+            'data' => $job
+        ], 201);
     }
 }

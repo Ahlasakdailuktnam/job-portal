@@ -42,4 +42,40 @@ class Job extends Model
     {
         return $this->hasMany(SavedJob::class);
     }
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when(
+            $filters['keyword'] ?? null,
+            fn($q, $keyword)
+            => $q->where('title', 'like', "%{$keyword}%")
+        );
+
+        $query->when(
+            $filters['category'] ?? null,
+            fn($q, $category)
+            => $q->where('category_id', $category)
+        );
+
+        $query->when(
+            $filters['job_type'] ?? null,
+            fn($q, $jobType)
+            => $q->where('job_type', $jobType)
+        );
+
+        $query->when(
+            $filters['salary_min'] ?? null,
+            fn($q, $salaryMin)
+            => $q->where('salary_min', '>=', $salaryMin)
+        );
+
+        $query->when(
+            $filters['salary_max'] ?? null,
+            fn($q, $salaryMax)
+            => $q->where('salary_max', '<=', $salaryMax)
+        );
+    }
 }

@@ -180,11 +180,13 @@ Route::middleware([
     Route::controller(JobController::class)->group(function () {
         Route::post('/jobs', 'store');
     });
+
+    Route::get('/my-jobs/{id}', [JobController::class, 'showMyJob']);
 });
 
 /*
 |--------------------------------------------------------------------------
-| Admin routes
+| Admin routesz
 |--------------------------------------------------------------------------
 */
 Route::middleware([
@@ -213,9 +215,10 @@ Route::middleware([
         Route::put('/subscriptions/{id}', 'update');
         Route::delete('/subscriptions/{id}', 'destroy');
     });
-
+    
     Route::prefix('admin')->group(function () {
         Route::prefix('jobs')->controller(AdminJobController::class)->group(function () {
+            Route::post('/', 'store');
             Route::get('/pending', 'pendingJobs');
             Route::put('/{id}/approve', 'approveJob');
             Route::put('/{id}/reject', 'rejectJob');
