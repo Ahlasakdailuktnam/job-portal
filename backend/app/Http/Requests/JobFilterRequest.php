@@ -17,6 +17,7 @@ class JobFilterRequest extends FormRequest
             'keyword' => ['nullable', 'string'],
             'category' => ['nullable', 'integer'],
             'job_type' => ['nullable', 'string'],
+            'job_level' => ['nullable', 'string'],
             'salary_min' => ['nullable', 'numeric'],
             'salary_max' => ['nullable', 'numeric'],
         ];

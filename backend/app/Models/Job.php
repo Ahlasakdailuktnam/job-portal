@@ -48,34 +48,41 @@ class Job extends Model
     }
     public function scopeFilter($query, array $filters)
     {
-        $query->when(
-            $filters['keyword'] ?? null,
-            fn($q, $keyword)
-            => $q->where('title', 'like', "%{$keyword}%")
-        );
+        return $query
+            ->when(
+                $filters['keyword'] ?? null,
+                fn($q, $keyword) =>
+                $q->where('title', 'like', "%{$keyword}%")
+            )
 
-        $query->when(
-            $filters['category'] ?? null,
-            fn($q, $category)
-            => $q->where('category_id', $category)
-        );
+            ->when(
+                $filters['category'] ?? null,
+                fn($q, $category) =>
+                $q->where('category_id', $category)
+            )
 
-        $query->when(
-            $filters['job_type'] ?? null,
-            fn($q, $jobType)
-            => $q->where('job_type', $jobType)
-        );
+            ->when(
+                $filters['job_type'] ?? null,
+                fn($q, $jobType) =>
+                $q->where('job_type', $jobType)
+            )
 
-        $query->when(
-            $filters['salary_min'] ?? null,
-            fn($q, $salaryMin)
-            => $q->where('salary_min', '>=', $salaryMin)
-        );
+            ->when(
+                $filters['job_level'] ?? null,
+                fn($q, $jobLevel) =>
+                $q->where('job_level', $jobLevel)
+            )
 
-        $query->when(
-            $filters['salary_max'] ?? null,
-            fn($q, $salaryMax)
-            => $q->where('salary_max', '<=', $salaryMax)
-        );
+            ->when(
+                $filters['salary_min'] ?? null,
+                fn($q, $salaryMin) =>
+                $q->where('salary_min', '>=', $salaryMin)
+            )
+
+            ->when(
+                $filters['salary_max'] ?? null,
+                fn($q, $salaryMax) =>
+                $q->where('salary_max', '<=', $salaryMax)
+            );
     }
 }

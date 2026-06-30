@@ -112,10 +112,7 @@ class JobController extends Controller
    public function index(JobFilterRequest $request)
 {
     $jobs = Job::query()
-        ->with([
-            'company',
-            'category'
-        ])
+        ->with(['company','category'])
         ->active()
         ->filter($request->validated())
         ->latest()
