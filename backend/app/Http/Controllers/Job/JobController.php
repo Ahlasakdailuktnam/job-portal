@@ -109,20 +109,20 @@ class JobController extends Controller
         ], 201);
     }
 
-   public function index(JobFilterRequest $request)
-{
-    $jobs = Job::query()
-        ->with(['company','category'])
-        ->active()
-        ->filter($request->validated())
-        ->latest()
-        ->paginate(10);
+    public function index(JobFilterRequest $request)
+    {
+        $jobs = Job::query()
+            ->with(['company', 'category'])
+            ->active()
+            ->filter($request->validated())
+            ->latest()
+            ->paginate(10);
 
-    return response()->json([
-        'success' => true,
-        'data' => $jobs
-    ]);
-}
+        return response()->json([
+            'success' => true,
+            'data' => $jobs
+        ]);
+    }
 
     // GET SINGLE JOB
     public function show($id)
@@ -165,6 +165,7 @@ class JobController extends Controller
             ->when($request->filled('status'), function ($query) use ($request) {
                 $query->where('status', $request->status);
             })
+            ->filter($request->validated())
             ->latest()
             ->paginate($request->integer('per_page', 10));
 

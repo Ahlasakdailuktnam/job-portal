@@ -182,6 +182,7 @@ Route::middleware([
     });
 
     Route::get('/my-jobs/{id}', [JobController::class, 'showMyJob']);
+    Route::get('/my-jobs', [JobController::class, 'myJobs']);
 });
 
 /*
