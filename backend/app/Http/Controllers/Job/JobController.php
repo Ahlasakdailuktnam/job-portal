@@ -155,19 +155,18 @@ class JobController extends Controller
             'data' => $job
         ]);
     }
-    public function myJobs(Request $request)
+    public function myJobs(JobFilterRequest $request)
     {
         $company = auth()->user()->company;
 
         $jobs = $company->jobs()
             ->with('category')
             ->withCount('applications')
-            ->when($request->filled('status'), function ($query) use ($request) {
-                $query->where('status', $request->status);
-            })
             ->filter($request->validated())
             ->latest()
-            ->paginate($request->integer('per_page', 10));
+            ->paginate(
+                $request->integer('per_page', 10)
+            );
 
         return response()->json([
             'success' => true,
@@ -175,7 +174,6 @@ class JobController extends Controller
         ]);
     }
 
-    // UPDATE JOB
     public function update(Request $request, $id)
     {
         $company = auth()->user()->company;
@@ -184,6 +182,13 @@ class JobController extends Controller
             ->where('company_id', $company->id)
             ->firstOrFail();
 
+        // Only draft and pending can be edited
+        if (!in_array($job->status, ['draft', 'pending'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only draft and pending jobs can be updated.'
+            ], 403);
+        }
         $validated = $request->validate([
             'category_id' => 'sometimes|exists:job_categories,id',
             'title' => 'sometimes|string|max:255',
@@ -199,11 +204,13 @@ class JobController extends Controller
             'available_position' => 'nullable|integer|min:1',
             'language' => 'nullable|string|max:255',
             'deadline' => 'nullable|date',
-            'status' => 'nullable|in:draft,pending,active,rejected,closed'
+            'status' => 'nullable|in:draft,pending,active,rejected,closed',
         ]);
+
         if ($request->has('status')) {
             $validated['status'] = $request->status;
         }
+
         $job->update($validated);
 
         return response()->json([

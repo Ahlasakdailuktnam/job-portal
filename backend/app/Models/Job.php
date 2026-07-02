@@ -83,6 +83,11 @@ class Job extends Model
                 $filters['salary_max'] ?? null,
                 fn($q, $salaryMax) =>
                 $q->where('salary_max', '<=', $salaryMax)
+            )
+            ->when(
+                $filters['status'] ?? null,
+                fn($q, $status) =>
+                $q->where('status', $status)
             );
     }
 }

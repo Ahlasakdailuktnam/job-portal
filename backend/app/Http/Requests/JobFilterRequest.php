@@ -20,6 +20,7 @@ class JobFilterRequest extends FormRequest
             'job_level' => ['nullable', 'string'],
             'salary_min' => ['nullable', 'numeric'],
             'salary_max' => ['nullable', 'numeric'],
+            'status' => ['nullable', 'string'],
         ];
     }
 }
