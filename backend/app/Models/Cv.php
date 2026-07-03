@@ -16,6 +16,7 @@ class Cv extends Model
         'summary',
         'profile_image',
         'cv_file',
+        "template",
         'source',
     ];
 

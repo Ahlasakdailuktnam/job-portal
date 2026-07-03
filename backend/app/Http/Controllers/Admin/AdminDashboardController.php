@@ -17,8 +17,6 @@ class AdminDashboardController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-
-                // Users
                 'total_users' => User::count(),
                 'total_admins' => User::where(
                     'role',

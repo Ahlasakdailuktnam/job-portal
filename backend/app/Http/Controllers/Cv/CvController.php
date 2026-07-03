@@ -28,7 +28,6 @@ class CvController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-
             'phone' => 'required|string|max:50',
             'address' => 'nullable|string',
             'linkedin' => 'nullable|string',
@@ -36,6 +35,7 @@ class CvController extends Controller
             'summary' => 'nullable|string',
             'profile_image' => 'nullable|string',
             'cv_file' => 'nullable|string',
+            'template' => 'nullable|in:modern,classic,minimal',
             'source' => 'nullable|in:generated,uploaded',
         ]);
 
@@ -86,6 +86,7 @@ class CvController extends Controller
             'summary' => 'nullable|string',
             'profile_image' => 'nullable|string',
             'cv_file' => 'nullable|string',
+            'template' => 'sometimes|in:modern,classic,minimal',
             'source' => 'nullable|in:generated,uploaded',
         ]);
 
@@ -127,10 +128,9 @@ class CvController extends Controller
             })
             ->findOrFail($id);
 
-        $pdf = Pdf::loadView(
-            'pdf.cv',
-            compact('cv')
-        );
+        $view = "pdf." . $cv->template;
+
+        $pdf = Pdf::loadView($view, compact('cv'));
 
         return $pdf->download(
             'cv-' . $cv->id . '.pdf'

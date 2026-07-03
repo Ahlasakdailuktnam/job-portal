@@ -11,21 +11,17 @@ class SavedJobController extends Controller
 {
     public function saveJob($jobId)
     {
-        $job = Job::where(
-            'status',
-            'active'
-        )->findOrFail($jobId);
-        $exists = SavedJob::where(
-            'user_id',
-            auth()->id()
-        )
-            ->where(
-                'job_id',
-                $jobId
-            )
-            ->exists();
+        $userId = auth()->id();
 
-        if ($exists) {
+        // Check job exists and is active
+        Job::where('status', 'active')->findOrFail($jobId);
+
+        // Prevent duplicate saved jobs
+        if (
+            SavedJob::where('user_id', $userId)
+                ->where('job_id', $jobId)
+                ->exists()
+        ) {
             return response()->json([
                 'success' => false,
                 'message' => 'Job already saved'
@@ -33,57 +29,55 @@ class SavedJobController extends Controller
         }
 
         $savedJob = SavedJob::create([
-            'user_id' => auth()->id(),
-            'job_id' => $jobId
+            'user_id' => $userId,
+            'job_id' => $jobId,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Job saved successfully',
-            'data' => $savedJob
-        ]);
+            'data' => $savedJob,
+        ], 201);
     }
+
+    
     public function unsaveJob($jobId)
     {
-        $savedJob = SavedJob::where(
-            'user_id',
-            auth()->id()
-        )
-            ->where(
-                'job_id',
-                $jobId
-            )
-            ->first();
+        $userId = auth()->id();
 
-        if (!$savedJob) {
+        $deleted = SavedJob::where('user_id', $userId)
+            ->where('job_id', $jobId)
+            ->delete();
+
+        if (!$deleted) {
             return response()->json([
                 'success' => false,
                 'message' => 'Saved job not found'
             ], 404);
         }
 
-        $savedJob->delete();
-
         return response()->json([
             'success' => true,
             'message' => 'Job removed from saved list'
         ]);
     }
+
+   
     public function mySavedJobs()
     {
-        $jobs = SavedJob::with([
-            'job.company'
+        $userId = auth()->id();
+
+        $savedJobs = SavedJob::with([
+            'job.company',
+            'job.category'
         ])
-            ->where(
-                'user_id',
-                auth()->id()
-            )
+            ->where('user_id', $userId)
             ->latest()
             ->paginate(10);
 
         return response()->json([
             'success' => true,
-            'data' => $jobs
+            'data' => $savedJobs
         ]);
     }
 }
