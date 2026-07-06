@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminJobController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\PlanController;
@@ -41,7 +42,12 @@ Route::controller(PlanController::class)->group(function () {
     Route::get('/plans/{id}', 'show');
 });
 
+Route::get('/job-categories', [JobCategoryController::class, 'index']);
 
+ Route::controller(JobController::class)->group(function () {
+        Route::get('/jobs', 'index');
+        Route::get('/jobs/{id}', 'show');
+    });
 /*    
 |--------------------------------------------------------------------------
 | Authenticated user routes
@@ -53,7 +59,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', 'me');
     });
 
-    Route::get('/job-categories', [JobCategoryController::class, 'index']);
     Route::controller(SubscriptionController::class)->group(function () {
         Route::post('/subscriptions', 'store');
         Route::get('/subscriptions/{id}', 'show');
@@ -95,10 +100,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/educations/{id}', 'destroy');
     });
 
-    Route::controller(JobController::class)->group(function () {
-        Route::get('/jobs', 'index');
-        Route::get('/jobs/{id}', 'show');
-    });
+   
 
     Route::controller(JobApplicationController::class)->group(function () {
         Route::post('/jobs/{jobId}/apply', 'apply');
@@ -152,6 +154,8 @@ Route::middleware([
     Route::controller(JobController::class)->group(function () {
         Route::put('/jobs/{id}', 'update');
         Route::delete('/jobs/{id}', 'destroy');
+        Route::post('/jobs/{id}/close', 'close');
+        Route::post('/jobs/{id}/reopen', 'reopen');
     });
 
     Route::controller(JobApplicationController::class)->group(function () {
@@ -218,6 +222,12 @@ Route::middleware([
     });
     
     Route::prefix('admin')->group(function () {
+        Route::controller(AdminUserController::class)->group(function () {
+            Route::get('/users', 'users');
+            Route::get('/recruiters', 'recruiters');
+            Route::get('/companies', 'companies');
+        });
+
         Route::prefix('jobs')->controller(AdminJobController::class)->group(function () {
             Route::post('/', 'store');
             Route::get('/pending', 'pendingJobs');

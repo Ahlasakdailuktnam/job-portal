@@ -6,14 +6,15 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Controllers\Controller;
 use App\Models\Cv;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CvController extends Controller
 {
-    // GET MY CVS
     public function index()
     {
         $cvs = auth()->user()
             ->cvs()
+            ->with(['educations', 'experiences', 'skills'])
             ->latest()
             ->get();
 
@@ -23,7 +24,6 @@ class CvController extends Controller
         ]);
     }
 
-    // CREATE CV
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -33,11 +33,18 @@ class CvController extends Controller
             'linkedin' => 'nullable|string',
             'telegram' => 'nullable|string',
             'summary' => 'nullable|string',
-            'profile_image' => 'nullable|string',
+            'profile_image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             'cv_file' => 'nullable|string',
             'template' => 'nullable|in:modern,classic,minimal',
             'source' => 'nullable|in:generated,uploaded',
         ]);
+
+        if ($request->hasFile('profile_image')) {
+            $image = $request->file('profile_image');
+            $filename = 'profile_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $path = $image->storeAs('cv/profile-images', $filename, 'public');
+            $validated['profile_image'] = $path;
+        }
 
         $cv = Cv::create([
             'user_id' => auth()->id(),
@@ -51,7 +58,6 @@ class CvController extends Controller
         ], 201);
     }
 
-    // GET all cv data
     public function show($id)
     {
         $cv = Cv::with([
@@ -70,7 +76,6 @@ class CvController extends Controller
         ]);
     }
 
-    // UPDATE CV
     public function update(Request $request, $id)
     {
         $cv = Cv::where('id', $id)
@@ -84,11 +89,22 @@ class CvController extends Controller
             'linkedin' => 'nullable|string',
             'telegram' => 'nullable|string',
             'summary' => 'nullable|string',
-            'profile_image' => 'nullable|string',
+            'profile_image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             'cv_file' => 'nullable|string',
             'template' => 'sometimes|in:modern,classic,minimal',
             'source' => 'nullable|in:generated,uploaded',
         ]);
+
+        if ($request->hasFile('profile_image')) {
+            if ($cv->profile_image && Storage::disk('public')->exists($cv->profile_image)) {
+                Storage::disk('public')->delete($cv->profile_image);
+            }
+
+            $image = $request->file('profile_image');
+            $filename = 'profile_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $path = $image->storeAs('cv/profile-images', $filename, 'public');
+            $validated['profile_image'] = $path;
+        }
 
         $cv->update($validated);
 
@@ -99,12 +115,15 @@ class CvController extends Controller
         ]);
     }
 
-    // DELETE CV
     public function destroy($id)
     {
         $cv = Cv::where('id', $id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
+
+        if ($cv->profile_image && Storage::disk('public')->exists($cv->profile_image)) {
+            Storage::disk('public')->delete($cv->profile_image);
+        }
 
         $cv->delete();
 
@@ -113,27 +132,28 @@ class CvController extends Controller
             'message' => 'CV deleted successfully'
         ]);
     }
+
     public function download($id)
     {
-        $company = auth()->user()->company;
-
         $cv = Cv::with([
             'user',
             'educations',
             'experiences',
             'skills'
         ])
-            ->whereHas('applications.job', function ($query) use ($company) {
-                $query->where('company_id', $company->id);
-            })
-            ->findOrFail($id);
+            ->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
-        $view = "pdf." . $cv->template;
+        $template = $cv->template ?? 'classic';
+        $view = "pdf." . $template;
 
         $pdf = Pdf::loadView($view, compact('cv'));
 
-        return $pdf->download(
-            'cv-' . $cv->id . '.pdf'
-        );
+        $filename = $cv->title 
+            ? str_replace(' ', '_', $cv->title) . '_' . $cv->id . '.pdf'
+            : 'cv-' . $cv->id . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

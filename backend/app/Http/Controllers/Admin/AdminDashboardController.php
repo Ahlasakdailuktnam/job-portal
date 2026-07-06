@@ -9,11 +9,51 @@ use App\Models\JobApplication;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\User;
+use Carbon\Carbon;
 
 class AdminDashboardController extends Controller
 {
     public function dashboard()
     {
+        $monthlyRevenue = collect(range(11, 0))
+            ->map(function ($monthsAgo) {
+                $date = Carbon::now()->startOfMonth()->subMonths($monthsAgo);
+                $nextMonth = $date->copy()->addMonth();
+
+                return [
+                    'month' => $date->format('M'),
+                    'month_number' => $date->format('m'),
+                    'year' => $date->format('Y'),
+                    'label' => $date->format('M Y'),
+                    'revenue' => (float) Payment::where('status', 'paid')
+                        ->where('paid_at', '>=', $date)
+                        ->where('paid_at', '<', $nextMonth)
+                        ->sum('amount'),
+                    'payments' => Payment::where('status', 'paid')
+                        ->where('paid_at', '>=', $date)
+                        ->where('paid_at', '<', $nextMonth)
+                        ->count(),
+                ];
+            });
+
+        $currentMonthStart = Carbon::now()->startOfMonth();
+        $nextMonthStart = $currentMonthStart->copy()->addMonth();
+        $previousMonthStart = $currentMonthStart->copy()->subMonth();
+
+        $currentMonthRevenue = (float) Payment::where('status', 'paid')
+            ->where('paid_at', '>=', $currentMonthStart)
+            ->where('paid_at', '<', $nextMonthStart)
+            ->sum('amount');
+
+        $previousMonthRevenue = (float) Payment::where('status', 'paid')
+            ->where('paid_at', '>=', $previousMonthStart)
+            ->where('paid_at', '<', $currentMonthStart)
+            ->sum('amount');
+
+        $monthlyRevenueChange = $previousMonthRevenue > 0
+            ? round((($currentMonthRevenue - $previousMonthRevenue) / $previousMonthRevenue) * 100, 1)
+            : ($currentMonthRevenue > 0 ? 100 : 0);
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -123,6 +163,10 @@ class AdminDashboardController extends Controller
                     'status',
                     'paid'
                 )->sum('amount'),
+                'current_month_revenue' => $currentMonthRevenue,
+                'previous_month_revenue' => $previousMonthRevenue,
+                'monthly_revenue_change' => $monthlyRevenueChange,
+                'monthly_revenue' => $monthlyRevenue,
             ]
         ]);
     }

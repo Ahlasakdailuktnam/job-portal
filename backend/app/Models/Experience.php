@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Experience extends Model
 {
+    protected $table = 'experiences'; 
+
     protected $fillable = [
         'cv_id',
         'company_name',
@@ -15,7 +18,7 @@ class Experience extends Model
         'description',
     ];
 
-    public function cv()
+    public function cv(): BelongsTo
     {
         return $this->belongsTo(Cv::class);
     }
