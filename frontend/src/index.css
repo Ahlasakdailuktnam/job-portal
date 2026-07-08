@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+.font-khmer {
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+ @keyframes scroll-right {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-33.33%);
+          }
+        }
+        
+        .animate-scroll-right {
+          animation: scroll-right 30s linear infinite;
+        }
+        
+        .animate-scroll-right:hover {
+          animation-play-state: paused;
+        }
