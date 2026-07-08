@@ -1,0 +1,185 @@
+2. Senior Way: Use when()
+
+Laravel មាន method when()
+
+$jobs = Job::with(['company', 'category'])
+    ->where('status', 'active')
+
+    ->when($request->keyword, function ($query, $keyword) {
+        $query->where('title', 'like', "%{$keyword}%");
+    })
+
+    ->when($request->category, function ($query, $category) {
+        $query->where('category_id', $category);
+    })
+
+    ->when($request->job_type, function ($query, $jobType) {
+        $query->where('job_type', $jobType);
+    })
+
+    ->latest()
+    ->paginate(10);
+
+អានស្រួលជាង។
+
+3. Better: Create Filter Scope
+
+ក្នុង Model
+
+class Job extends Model
+{
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when(
+            $filters['keyword'] ?? false,
+            fn($q, $keyword) =>
+                $q->where('title', 'like', "%{$keyword}%")
+        );
+
+        $query->when(
+            $filters['category'] ?? false,
+            fn($q, $category) =>
+                $q->where('category_id', $category)
+        );
+
+        $query->when(
+            $filters['job_type'] ?? false,
+            fn($q, $jobType) =>
+                $q->where('job_type', $jobType)
+        );
+    }
+}
+
+Controller
+
+public function index(Request $request)
+{
+    $jobs = Job::with([
+            'company',
+            'category'
+        ])
+        ->where('status', 'active')
+        ->filter($request->all())
+        ->latest()
+        ->paginate(10);
+
+    return response()->json([
+        'success' => true,
+        'data' => $jobs
+    ]);
+}
+
+នេះជា pattern ដែល project ធំៗប្រើច្រើន។
+
+4. Most Professional: Dedicated Filter Class
+
+Folder
+
+app/
+ └── Filters/
+      └── JobFilter.php
+
+JobFilter.php
+
+class JobFilter
+{
+    public function apply($query, Request $request)
+    {
+        return $query
+
+            ->when(
+                $request->keyword,
+                fn($q) =>
+                    $q->where(
+                        'title',
+                        'like',
+                        "%{$request->keyword}%"
+                    )
+            )
+
+            ->when(
+                $request->category,
+                fn($q) =>
+                    $q->where(
+                        'category_id',
+                        $request->category
+                    )
+            )
+            ->when(
+                $request->job_type,
+                fn($q) =>
+                    $q->where(
+                        'job_type',
+                        $request->job_type
+                    )
+            );
+    }
+}
+
+Controller
+
+public function index(
+    Request $request,
+    JobFilter $filter
+)
+{
+    $jobs = $filter
+        ->apply(
+            Job::with([
+                'company',
+                'category'
+            ])
+            ->where('status', 'active'),
+            $request
+        )
+        ->latest()
+        ->paginate(10);
+    return response()->json([
+        'success' => true,
+        'data' => $jobs
+    ]);
+}
+
+
+
+
+
+Key Improvements Made:
+Repository Pattern - Separation of concerns, easier testing
+
+Service Layer - Business logic abstraction
+
+API Resources - Consistent response formatting
+
+DTO Pattern - Type-safe data transfer
+
+Caching Strategy - Performance optimization
+
+Database Optimization - Indexes, partitioning
+
+Enterprise Structure - Scalable folder organization
+
+Event-Driven Design - Loose coupling
+
+Queue Jobs - Async processing
+
+Rate Limiting - API protection
+
+Exception Handling - Consistent error responses
+
+Configuration Management - Environment-specific settings
+
+Next Steps:
+Implement comprehensive unit testing
+
+Set up monitoring (Sentry, New Relic)
+
+Implement CI/CD pipeline
+
+Create API documentation (Swagger)
+
+Set up logging and audit trails
+
+Implement health checks
+
+Create deployment scripts

@@ -1,0 +1,36 @@
+                 TanStack Query
+
+           ┌────────────────────┐
+           │     useQuery        │
+           └────────────────────┘
+                    │
+                    ▼
+               READ DATA
+          (GET Request Only)
+
+     Jobs List
+     Job Detail
+     CV List
+     CV Detail
+
+────────────────────────────────────
+
+           ┌────────────────────┐
+           │    useMutation      │
+           └────────────────────┘
+                    │
+                    ▼
+              CHANGE DATA
+
+     Create (POST)
+     Update (PUT/PATCH)
+     Delete (DELETE)
+
+
+DataType	Default Value	ប្រើនៅពេល
+Array	    []	             .map(), .filter(), .length for get all data
+Object      null ឬ {}	     .title, .name, .email for get one detail data
+
+useQuery for get getdetail data (component mount it work)
+useMutation create update delete (wait the active from the user)
+enable use it when we want to ask ourself like that does if dont have param does it work if work no use it if dont work use it like the the getdetail if id underfind it will make it crash so we need to use it to check the condition

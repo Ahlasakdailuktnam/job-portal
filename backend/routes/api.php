@@ -17,6 +17,7 @@ use App\Http\Controllers\Job\JobController;
 use App\Http\Controllers\Job\SavedJobController;
 use App\Http\Controllers\Notification\NotificationController;
 use App\Http\Controllers\Payment\PaymentController;
+use App\Http\Controllers\Recruiter\RecruiterSettingsController;
 use App\Http\Controllers\Subscription\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
@@ -168,6 +169,11 @@ Route::middleware([
         CompanyDashboardController::class,
         'dashboard',
     ]);
+
+    Route::controller(RecruiterSettingsController::class)->group(function () {
+        Route::get('/recruiter/settings', 'show');
+        Route::put('/recruiter/settings', 'update');
+    });
 });
 
 /*

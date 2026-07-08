@@ -1,0 +1,56 @@
+┌─────────────────────────────────────────────────────────┐
+│                    useSavedJobsManager                   │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │  useSavedJobs()  ← fetch saved jobs (1 time)     │  │
+│  │  useSaveJob()    ← mutation with Optimistic UI   │  │
+│  │  useUnsaveJob()  ← mutation with Optimistic UI   │  │
+│  │                                                   │  │
+│  │  savedJobIds (Set) ← for quick check             │  │
+│  │  loadingJobId      ← track which job is saving   │  │
+│  │  toggleSave(job)   ← handles both save/unsave    │  │
+│  └───────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+                          │
+        ┌─────────────────┼─────────────────┐
+        │                 │                 │
+        ▼                 ▼                 ▼
+┌───────────────┐ ┌───────────────┐ ┌───────────────┐
+│   FindJobs    │ │   JobCart     │ │  JobDetail    │
+│               │ │               │ │               │
+│ useSavedJobs  │ │ useSavedJobs  │ │ useSavedJobs  │
+│ Manager       │ │ Manager       │ │ Manager       │
+│               │ │               │ │               │
+│ toggleSave()  │ │ toggleSave()  │ │ toggleSave()  │
+└───────────────┘ └───────────────┘ └───────────────┘
+        │                 │                 │
+        └─────────────────┼─────────────────┘
+                          ▼
+                 ┌───────────────┐
+                 │   JobCard     │
+                 │               │
+                 │ isSaved       │
+                 │ onToggleSave  │
+                 │ isLoading     │
+                 └───────────────┘
+
+
+
+              CvBuilder
+                  │
+       ┌──────────┴──────────┐
+       │                     │
+   formData             selectedTemplate
+       │                     │
+       ├──────────┐          │
+       │          │          │
+    CvForm   CvPreview       │
+       │          │          │
+       └──── React State ────┘
+                  │
+           Save Button
+                  │
+            useMutation
+                  │
+              Laravel API
+                  │
+              Database
