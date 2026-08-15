@@ -1,6 +1,6 @@
 # ?? JobPortal �
 
-A modern, full-stack job portal built with **Laravel 10** (REST API) and **React + Vite** (SPA frontend), supporting job seekers, recruiters, and administrators.note this project for learning about TanStack Query Zustand Login with Google and Bakong payment so this project for other feature maybe work not well for frontend but backend is done a lot
+A job portal web built with **Laravel 10** (REST API) and **React + Vite** (SPA frontend), supporting job seekers, recruiters, and administrators.note this project for learning about TanStack Query Zustand Login with Google and Bakong payment so this project for other feature maybe work not well for frontend but backend is done a lot
 
 ---
 
