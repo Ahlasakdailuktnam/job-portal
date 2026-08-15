@@ -31,18 +31,32 @@ const AdminRoutes = () => {
         <Route path="/jobs" element={<ListJobs />} />
         <Route path="/jobs/pending" element={<AdminPendingJobs />} />
         <Route path="/companiesdetail" element={<CompanyDetail />} />
+        
+        {/* Categories */}
         <Route path="/category/list" element={<CategoryList />} />
-        <Route path="categories/edit/:id" element={<CategoryEdit />} />
-        <Route path="plans/edit/:id" element={<UpdatePlan />} />
+        <Route path="/categories" element={<CategoryList />} />
         <Route path="/category/add" element={<CategoryAdd />} />
-        <Route path="/plan/list" element={<ListPlan />} />
-        <Route path="/plan/add" element={<MakePlan />} />
-        <Route path="/all-users" element={<AdminUsers />} />
-        <Route path="/all-subs" element={<GetAllSubscription />} />
-        <Route path="/all-company" element={<AdminCompanies />} />
+        <Route path="/categories/create" element={<CategoryAdd />} />
+        <Route path="/categories/edit/:id" element={<CategoryEdit />} />
+        <Route path="/category/edit/:id" element={<CategoryEdit />} />
 
+        {/* Plans */}
+        <Route path="/plan/list" element={<ListPlan />} />
+        <Route path="/plans" element={<ListPlan />} />
+        <Route path="/plan" element={<ListPlan />} />
+        <Route path="/plan/add" element={<MakePlan />} />
+        <Route path="/plans/create" element={<MakePlan />} />
+        <Route path="/plans/edit/:id" element={<UpdatePlan />} />
+        <Route path="/plan/edit/:id" element={<UpdatePlan />} />
+
+        {/* Users, Companies, Subscriptions */}
+        <Route path="/all-users" element={<AdminUsers />} />
+        <Route path="/users" element={<AdminUsers />} />
         <Route path="/user" element={<AdminUsers />} />
-        <Route path="/plan" element={<AdminUsers />} />
+        <Route path="/all-company" element={<AdminCompanies />} />
+        <Route path="/companies" element={<AdminCompanies />} />
+        <Route path="/all-subs" element={<GetAllSubscription />} />
+        <Route path="/subscriptions" element={<GetAllSubscription />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

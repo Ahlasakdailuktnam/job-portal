@@ -116,7 +116,7 @@ class JobController extends Controller
             ->active()
             ->filter($request->validated())
             ->latest()
-            ->paginate(10);
+            ->paginate($request->integer('per_page', 10));
 
         return response()->json([
             'success' => true,

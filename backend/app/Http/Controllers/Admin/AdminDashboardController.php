@@ -68,9 +68,9 @@ class AdminDashboardController extends Controller
                     'recruiter'
                 )->count(),
 
-                'total_job_seekers' => User::where(
+                'total_job_seekers' => User::whereIn(
                     'role',
-                    'job_seeker'
+                    ['job_seeker', 'user']
                 )->count(),
 
                 // Companies

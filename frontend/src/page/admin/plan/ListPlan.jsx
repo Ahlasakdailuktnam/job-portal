@@ -79,10 +79,12 @@ const ListPlan = () => {
               គ្រប់គ្រងកញ្ចប់សេវាកម្មទាំងអស់ក្នុងប្រព័ន្ធ
             </p>
           </div>
-          <button className="bg-gray-800 text-white px-6 py-3 rounded-xl hover:bg-gray-900 transition-all flex items-center gap-2 shadow-lg hover:shadow-xl">
-            <Plus className="w-4 h-4" />
-            បង្កើតថ្មី
-          </button>
+          <Link to="/admin/plan/add">
+            <button className="bg-gray-800 text-white px-6 py-3 rounded-xl hover:bg-gray-900 transition-all flex items-center gap-2 shadow-lg hover:shadow-xl">
+              <Plus className="w-4 h-4" />
+              បង្កើតថ្មី
+            </button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-4 gap-4 mb-6">

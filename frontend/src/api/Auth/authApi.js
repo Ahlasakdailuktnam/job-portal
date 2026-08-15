@@ -14,6 +14,11 @@ export const verifyOtp = async (data) => {
   const res = await api.post("/auth/verify-otp", data);
   return res.data;
 };
+
+export const resendOtp = async (data) => {
+  const res = await api.post("/auth/resend-otp", data);
+  return res.data;
+};
 export const logout = async () => {
   const res = await api.post("/auth/logout");
   return res.data;

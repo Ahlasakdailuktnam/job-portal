@@ -6,6 +6,7 @@ import {
   Headphones,
   Database,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 
 const categories = [
@@ -42,6 +43,7 @@ const categories = [
 ];
 
 const PopularCategories = () => {
+  const navigate = useNavigate();
   const scrollContainerRef = useRef(null);
   const [activeDot, setActiveDot] = useState(0);
   const [totalDots, setTotalDots] = useState(0);
@@ -130,7 +132,10 @@ const PopularCategories = () => {
             </p>
           </div>
 
-          <button className="text-[#5B4CF0] font-semibold hover:underline">
+          <button 
+            onClick={() => navigate("/jobs")}
+            className="text-[#5B4CF0] font-semibold hover:underline"
+          >
             មើលទាំងអស់ →
           </button>
         </div>
@@ -156,7 +161,8 @@ const PopularCategories = () => {
           {categories.map((category, index) => (
             <div
               key={index}
-              className="group min-w-[260px] bg-[#f5f7fb]  rounded-2xl p-8 transition-all duration-300 hover:-translate-y-2 cursor-pointer flex-shrink-0"
+              onClick={() => navigate("/jobs")}
+              className="group min-w-[260px] bg-[#f5f7fb] rounded-2xl p-8 transition-all duration-300 hover:-translate-y-2 cursor-pointer flex-shrink-0"
             >
               
               {/* ICON BOX */}

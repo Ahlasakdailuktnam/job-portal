@@ -19,10 +19,16 @@ export const useCreateJob = () => {
     },
 
     onError: (error) => {
-      toast.error(
-        error?.response?.data?.message ||
-        "បង្កើតការងារបរាជ័យ"
-      );
+      const message = error?.response?.data?.message || "បង្កើតការងារបរាជ័យ";
+      // Don't toast for subscription errors — let the component handle redirect UI
+      const isSubscriptionError =
+        message === "Subscription expired" ||
+        message?.toLowerCase().includes("subscription") ||
+        message?.toLowerCase().includes("no active subscription");
+
+      if (!isSubscriptionError) {
+        toast.error(message);
+      }
     },
   });
 };

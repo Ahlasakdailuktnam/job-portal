@@ -14,6 +14,7 @@ import {
   Bell,
   Building,
   Plus,
+  Crown,
   Star,
   CheckCircle,
   Clock,
@@ -80,76 +81,40 @@ const SidebarPartner = ({ isCollapsed, setIsCollapsed }) => {
       id: "job-management",
       icon: Briefcase,
       label: "ការគ្រប់គ្រងការងារ",
-      path: "/recruiter/jobs",
+      path: "/recruiter/jobs/list",
       type: "dropdown",
-      badge: "12",
       subItems: [
         {
           path: "/recruiter/jobs/list",
           icon: Briefcase,
           label: "ការងាររបស់ខ្ញុំ",
-          badge: "24",
         },
         {
           path: "/recruiter/jobs/post",
           icon: Plus,
-          label: "បង្ហោះការងារ",
-          badge: "3",
-        },
-        {
-          path: "/recruiter/expired",
-          icon: Clock,
-          label: "ការងារផុតកំណត់",
-          badge: "7",
+          label: "បង្ហោះការងារថ្មី",
         },
       ],
     },
     {
       id: "candidate-management",
       icon: Users,
-      label: "បេក្ខជន",
+      label: "បេក្ខជនដាក់ពាក្យ",
       path: "/recruiter/candidates",
-      type: "dropdown",
-      badge: "342",
-      subItems: [
-        {
-          path: "/recruiter/candidates",
-          icon: Users,
-          label: "បេក្ខជនទាំងអស់",
-          badge: "342",
-        },
-        {
-          path: "/recruiter/shortlisted",
-          icon: Star,
-          label: "ជម្រើសពិសេស",
-          badge: "45",
-        },
-        {
-          path: "/recruiter/interviews",
-          icon: Calendar,
-          label: "ការសម្ភាសន៍",
-          badge: "12",
-        },
-        {
-          path: "/recruiter/hired",
-          icon: CheckCircle,
-          label: "បានជ្រើសរើស",
-          badge: "28",
-        },
-      ],
+      type: "single",
     },
     {
       id: "company",
       icon: Building,
-      label: "ក្រុមហ៊ុន",
+      label: "ព័ត៌មានក្រុមហ៊ុន",
       path: "/recruiter/company",
       type: "single",
     },
     {
-      id: "analytics",
-      icon: BarChart3,
-      label: "របាយការណ៍",
-      path: "/recruiter/analytics",
+      id: "plans",
+      icon: Crown,
+      label: "ជ្រើសរើសបែបផែន",
+      path: "/recruiter/plans",
       type: "single",
     },
     {
@@ -370,7 +335,7 @@ const SidebarPartner = ({ isCollapsed, setIsCollapsed }) => {
       >
         <div className="flex items-center justify-between p-5 border-b border-gray-200">
           <Link
-            to="/partner/dashboard"
+            to="/recruiter/dashboard"
             className="flex items-center gap-3"
             onClick={() => setIsMobileMenuOpen(false)}
           >
@@ -441,7 +406,7 @@ const SidebarPartner = ({ isCollapsed, setIsCollapsed }) => {
           className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"} p-5 border-b border-gray-200 h-[77px]`}
         >
           <Link
-            to="/partner/dashboard"
+            to="/recruiter/dashboard"
             className="flex items-center gap-3 overflow-hidden"
           >
             <div className="bg-gray-800 p-2.5 rounded-lg flex-shrink-0">

@@ -25,6 +25,10 @@ const JobPostingPlans = () => {
   const [msgLogin, setMsgLogin] = useState(false);
   const [plans, setPlans] = useState([]);
 
+  const toggleFAQ = (index) => {
+    setExpandedFAQ(expandedFAQ === index ? null : index);
+  };
+
   const navigate = useNavigate();
 
   const { token } = useAuthStore();
@@ -322,14 +326,10 @@ const JobPostingPlans = () => {
                   </span>
                 </div>
 
-                {plan.highlight && billingCycle === "yearly" && (
+                {billingCycle === "yearly" && (
                   <div className="mt-3">
                     <span className="text-xs bg-gray-800 text-gray-300 px-3 py-1.5 rounded-full">
-                      សន្សំបាន $
-                      {(pricingData.monthly[plan.id] -
-                        pricingData.yearly[plan.id]) *
-                        12}{" "}
-                      ក្នុងមួយឆ្នាំ
+                      សន្សំបាន ២០% ក្នុងមួយឆ្នាំ
                     </span>
                   </div>
                 )}

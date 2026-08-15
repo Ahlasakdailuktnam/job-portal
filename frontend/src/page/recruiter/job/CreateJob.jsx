@@ -258,6 +258,24 @@ const CreateJob = () => {
       onSuccess: () => {
         resetForm();
       },
+      onError: (error) => {
+        const message = error?.response?.data?.message || "";
+        const isSubscriptionError =
+          message === "Subscription expired" ||
+          message?.toLowerCase().includes("subscription") ||
+          message?.toLowerCase().includes("no active subscription");
+
+        if (isSubscriptionError) {
+          showModal(
+            "confirm",
+            "ការជាវផុតកំណត់",
+            "ការជាវបែបផែនរបស់អ្នកផុតកំណត់ ឬមិនសកម្ម។ សូមជ្រើសរើសបែបផែនសម្រាប់បន្ត បង្ហោះការងារ។",
+            () => navigate("/recruiter/plans"),
+          );
+        } else {
+          showModal("error", "មានបញ្ហា", message || "បង្កើតការងារបរាជ័យ");
+        }
+      },
     });
   };
 

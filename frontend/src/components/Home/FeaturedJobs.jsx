@@ -12,6 +12,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const featuredJobs = [
   {
@@ -107,6 +108,7 @@ const featuredJobs = [
 ];
 
 const FeaturedJobs = () => {
+  const navigate = useNavigate();
   const [savedJobs, setSavedJobs] = useState([]);
   const [visibleJobs, setVisibleJobs] = useState(3);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -265,7 +267,10 @@ const FeaturedJobs = () => {
 
           {/* View All Button */}
           <div className="text-center mt-12">
-            <button className="group relative inline-flex items-center gap-2 bg-[#5B4CF0] text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <button 
+              onClick={() => navigate("/jobs")}
+              className="group relative inline-flex items-center gap-2 bg-[#5B4CF0] text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+            >
               <span>មើលការងារទាំងអស់</span>
               <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
@@ -360,7 +365,13 @@ const JobCard = ({ job, isSaved, onSave, isHovered, onHover }) => {
         </div>
 
         {/* Apply Button */}
-        <button className="w-full bg-gray-900 text-white py-2.5 rounded-xl font-semibold hover:bg-[#5B4CF0] transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5">
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            window.location.href = `/jobs/${job.id}`;
+          }}
+          className="w-full bg-gray-900 text-white py-2.5 rounded-xl font-semibold hover:bg-[#5B4CF0] transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5"
+        >
           Apply Now →
         </button>
       </div>

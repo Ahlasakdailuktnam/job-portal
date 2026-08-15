@@ -1,17 +1,18 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   AlertCircle,
   Briefcase,
   CheckCircle,
   Clock,
+  Crown,
   Eye,
   FileText,
   Plus,
   RefreshCw,
   TrendingUp,
   UserCheck,
-  UserX,
+  Zap,
   Users,
 } from "lucide-react";
 import { useCompanyDashboard } from "../../hook/useDashboard";
@@ -63,6 +64,7 @@ const statCards = [
 ];
 
 const JobDashboard = () => {
+  const navigate = useNavigate();
   const {
     data: dashboardResponse,
     isLoading,
@@ -157,6 +159,30 @@ const JobDashboard = () => {
           </div>
         </div>
 
+        {/* Subscription Expired Full-Width Banner */}
+        {!subscription.active && (
+          <div className="flex items-center justify-between gap-4 rounded-xl border border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 px-5 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-amber-100">
+                <Crown className="text-amber-500" size={20} />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900">Subscription Expired</p>
+                <p className="text-sm text-gray-600">
+                  Your plan has expired. Renew now to post jobs and access candidate CVs.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate("/recruiter/plans")}
+              className="flex-shrink-0 inline-flex items-center gap-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 text-sm font-semibold transition"
+            >
+              <Zap size={14} />
+              Choose Plan
+            </button>
+          </div>
+        )}
+
         <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
           {statCards.map((card) => {
             const Icon = card.icon;
@@ -220,42 +246,75 @@ const JobDashboard = () => {
             </div>
           </section>
 
-          <section className="rounded-xl border border-gray-200 bg-white p-5">
-            <h2 className="font-bold text-gray-900">Subscription</h2>
-            <p className="mt-1 text-sm text-gray-500">
-              {subscription.active
-                ? `${subscription.plan_name || "Active plan"} plan`
-                : "No active plan"}
-            </p>
-            <div className="mt-5 space-y-4">
-              <InfoLine
-                label="Job slots"
-                value={
-                  subscription.remaining_slots === "Unlimited"
-                    ? "Unlimited"
-                    : `${subscription.remaining_slots || 0} remaining`
-                }
-              />
-              <InfoLine
-                label="Expires"
-                value={formatDate(subscription.expires_at)}
-              />
-              <div>
-                <div className="mb-1 flex justify-between text-sm">
-                  <span className="font-medium text-gray-700">CV views</span>
-                  <span className="text-gray-500">
-                    {cvLimit === -1 ? `${cvUsed} used` : `${cvUsed}/${cvLimit || 0}`}
-                  </span>
-                </div>
-                <div className="h-2 rounded-full bg-gray-100">
-                  <div
-                    className="h-2 rounded-full bg-gray-800"
-                    style={{ width: cvLimit === -1 ? "100%" : `${cvPercent}%` }}
-                  />
+          {/* Subscription Section */}
+          {subscription.active ? (
+            <section className="rounded-xl border border-gray-200 bg-white p-5">
+              <h2 className="font-bold text-gray-900">Subscription</h2>
+              <p className="mt-1 text-sm text-gray-500">
+                {subscription.plan_name || "Active plan"} plan
+              </p>
+              <div className="mt-5 space-y-4">
+                <InfoLine
+                  label="Job slots"
+                  value={
+                    subscription.remaining_slots === "Unlimited"
+                      ? "Unlimited"
+                      : `${subscription.remaining_slots || 0} remaining`
+                  }
+                />
+                <InfoLine
+                  label="Expires"
+                  value={formatDate(subscription.expires_at)}
+                />
+                <div>
+                  <div className="mb-1 flex justify-between text-sm">
+                    <span className="font-medium text-gray-700">CV views</span>
+                    <span className="text-gray-500">
+                      {cvLimit === -1 ? `${cvUsed} used` : `${cvUsed}/${cvLimit || 0}`}
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-gray-100">
+                    <div
+                      className="h-2 rounded-full bg-gray-800"
+                      style={{ width: cvLimit === -1 ? "100%" : `${cvPercent}%` }}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
+              <button
+                onClick={() => navigate("/recruiter/jobs/post")}
+                className="mt-5 w-full rounded-lg bg-gray-800 py-2.5 text-sm font-medium text-white hover:bg-gray-900 transition"
+              >
+                Post a Job
+              </button>
+            </section>
+          ) : (
+            /* Expired / No Plan Banner */
+            <section className="rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 p-5 flex flex-col items-center justify-center text-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
+                <Crown className="text-amber-500" size={28} />
+              </div>
+              <div>
+                <h2 className="font-bold text-gray-900 text-lg">Subscription Expired</h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  Your plan has expired or is inactive. Choose a new plan to continue posting jobs and accessing candidates.
+                </p>
+              </div>
+              <button
+                onClick={() => navigate("/recruiter/plans")}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white px-5 py-3 text-sm font-semibold transition shadow-sm"
+              >
+                <Zap size={16} />
+                Choose a Plan
+              </button>
+              <Link
+                to="/recruiter/plans"
+                className="text-xs text-gray-400 hover:text-gray-600 underline"
+              >
+                View all plans
+              </Link>
+            </section>
+          )}
         </div>
 
         <div className="grid gap-5 lg:grid-cols-2">

@@ -41,7 +41,7 @@ const RecruiterSettings = () => {
   return (
     <div className="px-4 md:px-6">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-6 rounded-xl border border-gray-200 bg-white p-5">
+        <div className="mb-6 rounded-xl border flex justify-between items-center border-gray-200 bg-white p-5">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-800 text-white">
               <Settings size={21} />
@@ -53,8 +53,9 @@ const RecruiterSettings = () => {
               <p className="text-sm text-gray-500">
                 Manage notification preferences for your recruiter account.
               </p>
-            </div>
+            </div> 
           </div>
+          <a href="https://www.youtube.com/watch?v=l5YDtSLGhqk"  className="text-sm font-medium underline hover:text-blue-600">How to get Telegram Chat ID</a>
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white">

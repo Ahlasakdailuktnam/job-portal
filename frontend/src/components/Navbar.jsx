@@ -5,7 +5,6 @@ import {
   LayoutDashboardIcon, 
   Save, 
   Bell, 
-  User, 
   Settings, 
   LogOut, 
   ChevronDown,
@@ -45,14 +44,14 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="w-full border-b border-gray-200 sticky top-0 z-50">
+    <header className="w-full border-b border-gray-200 sticky top-0 z-50 bg-white/95 backdrop-blur-md">
       <div className="px-4 md:px-6 lg:px-14 flex items-center justify-between h-16 md:h-20">
-        {/* Logo - Original Size */}
+        {/* Logo */}
         <Link to="/" className="flex-shrink-0">
-          <img className="w-28 h-28" src={logo} alt="Logo" />
+          <img className="w-28 h-28 object-contain" src={logo} alt="Logo" />
         </Link>
 
-        {/* Desktop Navigation - Original Font Size */}
+        {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-8 font-medium text-gray-600">
           {navLinks.map((link) => (
             <Link
@@ -68,7 +67,7 @@ const Navbar = () => {
         {/* Right Section */}
         <div className="flex items-center gap-3">
           {/* Notification Bell */}
-          <button className="relative p-2 hover:bg-gray-100 rounded-lg transition">
+          <button className="relative p-2 hover:bg-gray-100 rounded-lg transition" aria-label="Notifications">
             <Bell size={18} className="text-gray-600" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
@@ -77,6 +76,7 @@ const Navbar = () => {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition"
+            aria-label="Toggle Menu"
           >
             {mobileMenuOpen ? (
               <X size={22} className="text-gray-600" />
@@ -85,7 +85,7 @@ const Navbar = () => {
             )}
           </button>
 
-          {/* Auth Buttons or User Menu - Original Style */}
+          {/* Auth Buttons or User Menu */}
           {!user ? (
             <div className="flex items-center gap-3">
               <Link to="/login">
@@ -115,43 +115,53 @@ const Navbar = () => {
                   <p className="text-sm font-semibold text-gray-800">
                     {user.name}
                   </p>
-                  <p className="text-xs text-gray-500">{user.role}</p>
+                  <p className="text-xs text-gray-500 capitalize">{user.role}</p>
                 </div>
                 <ChevronDown size={16} className="text-gray-400" />
               </button>
 
               {/* Dropdown Menu */}
               {open && (
-                <div className="absolute right-0 top-full mt-2 w-60 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
-                  <div className="px-4 py-3 border-b">
-                    <p className="font-semibold">{user.name}</p>
-                    <p className="text-sm text-gray-500">{user.email}</p>
+                <div 
+                  className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                  onClick={() => setOpen(false)}
+                >
+                  <div className="px-4 py-3 border-b bg-gray-50">
+                    <p className="font-semibold text-gray-900">{user.name}</p>
+                    <p className="text-sm text-gray-500 truncate">{user.email}</p>
                   </div>
                   
+                  {user.role === "admin" && (
+                    <Link
+                      to="/admin/dashboard"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition font-medium text-gray-900"
+                    >
+                      <LayoutDashboardIcon size={16} />
+                      ផ្ទាំងគ្រប់គ្រង Admin
+                    </Link>
+                  )}
+
                   {user.role === "recruiter" && (
                     <Link
                       to="/recruiter/dashboard"
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition"
-                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition font-medium text-gray-900"
                     >
                       <LayoutDashboardIcon size={16} />
-                      Dashboard
+                      ផ្ទាំងគ្រប់គ្រងដៃគូ
                     </Link>
                   )}
                   
                   <Link
-                    to="/profile"
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition"
-                    onClick={() => setOpen(false)}
+                    to="/cv"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition text-gray-700"
                   >
-                    <User size={16} />
-                    Profile
+                    <FileText size={16} />
+                    CV របស់ខ្ញុំ
                   </Link>
                   
                   <Link
                     to="/saved-jobs"
-                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition"
-                    onClick={() => setOpen(false)}
+                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition text-gray-700"
                   >
                     <div className="flex items-center gap-3">
                       <Save size={16} />
@@ -166,31 +176,32 @@ const Navbar = () => {
 
                   <Link
                     to="/my-applications"
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition"
-                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition text-gray-700"
                   >
-                    <FileText size={16} />
-                    My Applications
+                    <Briefcase size={16} />
+                    ពាក្យដែលបានដាក់
                   </Link>
                   
-                  <Link
-                    to="/settings"
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition"
-                    onClick={() => setOpen(false)}
-                  >
-                    <Settings size={16} />
-                    Setting
-                  </Link>
+                  {user.role === "recruiter" && (
+                    <Link
+                      to="/recruiter/setting"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition text-gray-700"
+                    >
+                      <Settings size={16} />
+                      ការកំណត់
+                    </Link>
+                  )}
                   
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setOpen(false);
                       setShowLogoutModal(true);
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left border-t border-gray-100 transition"
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-600 text-left border-t border-gray-100 transition"
                   >
                     <LogOut size={16} />
-                    Logout
+                    ចាកចេញ
                   </button>
                 </div>
               )}
@@ -231,17 +242,37 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="flex flex-col gap-1 mt-3 pt-3 border-t border-gray-200">
+                {user.role === "admin" && (
+                  <Link
+                    to="/admin/dashboard"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium text-gray-900"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <LayoutDashboardIcon size={18} />
+                    <span className="text-sm font-medium">ផ្ទាំងគ្រប់គ្រង Admin</span>
+                  </Link>
+                )}
+                {user.role === "recruiter" && (
+                  <Link
+                    to="/recruiter/dashboard"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium text-gray-900"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <LayoutDashboardIcon size={18} />
+                    <span className="text-sm font-medium">ផ្ទាំងគ្រប់គ្រងដៃគូ</span>
+                  </Link>
+                )}
                 <Link
-                  to="/profile"
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition"
+                  to="/cv"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition text-gray-700"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <User size={18} />
-                  <span className="text-sm font-medium">Profile</span>
+                  <FileText size={18} />
+                  <span className="text-sm font-medium">CV របស់ខ្ញុំ</span>
                 </Link>
                 <Link
                   to="/saved-jobs"
-                  className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-gray-50 transition"
+                  className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-gray-50 transition text-gray-700"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <div className="flex items-center gap-3">
@@ -256,21 +287,21 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/my-applications"
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition text-gray-700"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <FileText size={18} />
-                  <span className="text-sm font-medium">My Applications</span>
+                  <Briefcase size={18} />
+                  <span className="text-sm font-medium">ពាក្យដែលបានដាក់</span>
                 </Link>
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     setShowLogoutModal(true);
                   }}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition text-left"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-50 text-red-600 transition text-left"
                 >
                   <LogOut size={18} />
-                  <span className="text-sm font-medium">Logout</span>
+                  <span className="text-sm font-medium">ចាកចេញ</span>
                 </button>
               </div>
             )}

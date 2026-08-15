@@ -10,6 +10,8 @@ import CreateJob from "../../page/recruiter/job/CreateJob";
 import PreviewJob from "../../page/recruiter/job/PreviewJob";
 import ListJob from "../../page/recruiter/job/ListJob";
 import RecruiterSettings from "../../page/recruiter/RecruiterSettings";
+import JobPostingPlans from "../../page/user/PostJob/JobPostingPlans";
+
 const PartnerRoute = () => {
   return (
     <Routes>
@@ -24,9 +26,14 @@ const PartnerRoute = () => {
         <Route path="/jobs/list" element={<ListJob />} />
         <Route path="/candidates" element={<CandidateManagement />} />
         <Route path="/jobs/post" element={<CreateJob />} />
+        <Route path="/jobs/create" element={<CreateJob />} />
         <Route path="/setting" element={<RecruiterSettings />} />
 
+        {/* Plans — recruiter selects/renews subscription here */}
+        <Route path="/plans" element={<JobPostingPlans />} />
+
         <Route path="/jobs/:id/preview" element={<PreviewJob />} />
+        <Route path="/jobs/:id/edit" element={<PreviewJob />} />
         <Route path="/jobs/preview" element={<PreviewJob />} />
 
         <Route path="/company" element={<CompanyPage />} />

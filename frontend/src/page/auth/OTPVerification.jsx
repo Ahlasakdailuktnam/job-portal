@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import useAuthStore from "../../store/authStore";
 import { useNavigate } from "react-router-dom";
-import { verifyOtp } from "../../api/Auth/authApi";
+import { verifyOtp, resendOtp } from "../../api/Auth/authApi";
 
 const OTP = () => {
   const [email, setEmail] = useState("");
@@ -113,15 +113,20 @@ const OTP = () => {
   const handleResend = async () => {
     if (timer > 0) return;
 
-    setLoading(true);
-    const res = await request("/auth/resend-otp", "post", { email });
-    setLoading(false);
-
-    if (res.message) {
-      setTimer(60);
+    try {
+      setLoading(true);
       setError("");
-    } else {
-      setError(res.message || "មិនអាចផ្ញើកូដបានទេ");
+      const res = await resendOtp({ email });
+      if (res.success || res.message) {
+        setTimer(60);
+        setError("");
+      } else {
+        setError(res.message || "មិនអាចផ្ញើកូដបានទេ");
+      }
+    } catch (err) {
+      setError(err?.response?.data?.message || "មិនអាចផ្ញើកូដបានទេ");
+    } finally {
+      setLoading(false);
     }
   };
 

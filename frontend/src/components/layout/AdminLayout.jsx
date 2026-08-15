@@ -17,7 +17,7 @@ const AdminLayout = () => {
         }`}
       >
         <div className="bg-white border-b border-gray-200">
-          <div className="lg:px-20 px-5 py-2.5">
+          {/* <div className="lg:px-20 px-5 py-2.5">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
@@ -38,7 +38,7 @@ const AdminLayout = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
         <main className="px-8 py-6">
           <Outlet />
