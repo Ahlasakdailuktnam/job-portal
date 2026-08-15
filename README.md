@@ -1,6 +1,6 @@
-# ?? JobPortal — Full-Stack Job Portal Platform
+# ?? JobPortal ï¿½
 
-A modern, full-stack job portal built with **Laravel 10** (REST API) and **React + Vite** (SPA frontend), supporting job seekers, recruiters, and administrators.
+A modern, full-stack job portal built with **Laravel 10** (REST API) and **React + Vite** (SPA frontend), supporting job seekers, recruiters, and administrators.note this project for learning about TanStack Query Zustand Login with Google and Bakong payment so this project for other feature maybe work not well
 
 ---
 
@@ -22,6 +22,7 @@ A modern, full-stack job portal built with **Laravel 10** (REST API) and **React
 ## ?? Overview
 
 JobPortal is a full-featured job marketplace platform where:
+
 - **Job Seekers** can browse jobs, apply, build CVs, and save favorite listings
 - **Recruiters** can create companies, post jobs (via subscription plans), and manage applications
 - **Admins** can manage users, categories, plans, subscriptions, and approve/reject job postings
@@ -31,29 +32,31 @@ JobPortal is a full-featured job marketplace platform where:
 ## ?? Tech Stack
 
 ### Backend
-| Technology | Version | Purpose |
-|---|---|---|
-| PHP | ^8.1 | Server-side language |
-| Laravel | ^10.0 | REST API framework |
-| Laravel Sanctum | ^3.3 | API token authentication |
-| Laravel Socialite | ^5.27 | Google OAuth login |
-| Laravel DomPDF | ^3.1 | CV PDF generation |
-| MySQL | Latest | Relational database |
+
+| Technology        | Version | Purpose                  |
+| ----------------- | ------- | ------------------------ |
+| PHP               | ^8.1    | Server-side language     |
+| Laravel           | ^10.0   | REST API framework       |
+| Laravel Sanctum   | ^3.3    | API token authentication |
+| Laravel Socialite | ^5.27   | Google OAuth login       |
+| Laravel DomPDF    | ^3.1    | CV PDF generation        |
+| MySQL             | Latest  | Relational database      |
 
 ### Frontend
-| Technology | Version | Purpose |
-|---|---|---|
-| React | ^19.2 | UI framework |
-| Vite | ^8.0 | Build tool & dev server |
-| React Router DOM | ^7.15 | Client-side routing |
-| Axios | ^1.16 | HTTP client |
-| Zustand | ^5.0 | Global state management |
-| TanStack Query | ^5.101 | Server state & caching |
-| Tailwind CSS | ^4.3 | Utility-first styling |
-| Lucide React | ^1.16 | Icon library |
-| Recharts | ^3.8 | Dashboard charts |
-| React Hot Toast | ^2.6 | Notifications |
-| SweetAlert2 | ^11.26 | Confirmation dialogs |
+
+| Technology       | Version | Purpose                 |
+| ---------------- | ------- | ----------------------- |
+| React            | ^19.2   | UI framework            |
+| Vite             | ^8.0    | Build tool & dev server |
+| React Router DOM | ^7.15   | Client-side routing     |
+| Axios            | ^1.16   | HTTP client             |
+| Zustand          | ^5.0    | Global state management |
+| TanStack Query   | ^5.101  | Server state & caching  |
+| Tailwind CSS     | ^4.3    | Utility-first styling   |
+| Lucide React     | ^1.16   | Icon library            |
+| Recharts         | ^3.8    | Dashboard charts        |
+| React Hot Toast  | ^2.6    | Notifications           |
+| SweetAlert2      | ^11.26  | Confirmation dialogs    |
 
 ---
 
@@ -62,35 +65,35 @@ JobPortal is a full-featured job marketplace platform where:
 ```
 jobPortal/
 +-- backend/                    # Laravel REST API
-¦   +-- app/
-¦   ¦   +-- Http/
-¦   ¦   ¦   +-- Controllers/
-¦   ¦   ¦   ¦   +-- AuthController.php
-¦   ¦   ¦   ¦   +-- Admin/
-¦   ¦   ¦   ¦   +-- Company/
-¦   ¦   ¦   ¦   +-- Cv/
-¦   ¦   ¦   ¦   +-- Dashboard/
-¦   ¦   ¦   ¦   +-- Job/
-¦   ¦   ¦   ¦   +-- Notification/
-¦   ¦   ¦   ¦   +-- Payment/
-¦   ¦   ¦   ¦   +-- Recruiter/
-¦   ¦   ¦   ¦   +-- Subscription/
-¦   ¦   ¦   +-- Middleware/
-¦   ¦   +-- Models/
-¦   ¦   +-- Services/
-¦   +-- database/migrations/
-¦   +-- routes/api.php
-¦
+ï¿½   +-- app/
+ï¿½   ï¿½   +-- Http/
+ï¿½   ï¿½   ï¿½   +-- Controllers/
+ï¿½   ï¿½   ï¿½   ï¿½   +-- AuthController.php
+ï¿½   ï¿½   ï¿½   ï¿½   +-- Admin/
+ï¿½   ï¿½   ï¿½   ï¿½   +-- Company/
+ï¿½   ï¿½   ï¿½   ï¿½   +-- Cv/
+ï¿½   ï¿½   ï¿½   ï¿½   +-- Dashboard/
+ï¿½   ï¿½   ï¿½   ï¿½   +-- Job/
+ï¿½   ï¿½   ï¿½   ï¿½   +-- Notification/
+ï¿½   ï¿½   ï¿½   ï¿½   +-- Payment/
+ï¿½   ï¿½   ï¿½   ï¿½   +-- Recruiter/
+ï¿½   ï¿½   ï¿½   ï¿½   +-- Subscription/
+ï¿½   ï¿½   ï¿½   +-- Middleware/
+ï¿½   ï¿½   +-- Models/
+ï¿½   ï¿½   +-- Services/
+ï¿½   +-- database/migrations/
+ï¿½   +-- routes/api.php
+ï¿½
 +-- frontend/                   # React + Vite SPA
     +-- src/
         +-- api/                # Axios instance & API calls
-        ¦   +-- axios.js        # Axios + request/response interceptors
+        ï¿½   +-- axios.js        # Axios + request/response interceptors
         +-- components/         # Reusable UI components
         +-- page/               # Page-level components
-        ¦   +-- auth/           # Login, Register, OTP
-        ¦   +-- user/           # Job Seeker pages
-        ¦   +-- recruiter/      # Recruiter pages
-        ¦   +-- admin/          # Admin pages
+        ï¿½   +-- auth/           # Login, Register, OTP
+        ï¿½   +-- user/           # Job Seeker pages
+        ï¿½   +-- recruiter/      # Recruiter pages
+        ï¿½   +-- admin/          # Admin pages
         +-- store/authStore.js  # Zustand auth state (persisted)
         +-- routes/             # React Router definitions
         +-- services/           # Business logic helpers
@@ -102,6 +105,7 @@ jobPortal/
 ## ? Features
 
 ### ????? Job Seeker
+
 - Register / Login with email & OTP verification
 - Google OAuth login
 - Browse and search job listings by category
@@ -113,6 +117,7 @@ jobPortal/
 - In-app notifications
 
 ### ?? Recruiter
+
 - Register as recruiter role
 - Create and manage company profile
 - Subscribe to a posting plan (required to post jobs)
@@ -123,6 +128,7 @@ jobPortal/
 - Company dashboard with analytics
 
 ### ??? Admin
+
 - Admin dashboard with platform-wide statistics
 - Manage all users and recruiters
 - Manage companies
@@ -133,6 +139,7 @@ jobPortal/
 - View pending jobs queue
 
 ### ?? Authentication & Security
+
 - OTP-based email verification on register & login
 - Google OAuth via Laravel Socialite
 - Laravel Sanctum token-based authentication
@@ -143,24 +150,24 @@ jobPortal/
 
 ## ?? Database Schema
 
-| Table | Description |
-|---|---|
-| `users` | All users (job seekers, recruiters, admins) |
-| `companies` | Recruiter company profiles |
-| `plans` | Subscription plan tiers |
-| `subscriptions` | User plan subscriptions |
-| `payments` | Payment records |
-| `job_categories` | Job classification categories |
-| `jobs` | Job listings with status (pending/approved/rejected) |
-| `job_applications` | Applications made by job seekers |
-| `saved_jobs` | Bookmarked jobs |
-| `cvs` | CV documents per user |
-| `education` | CV education entries |
-| `experiences` | CV work experience entries |
-| `skills` | CV skills entries |
-| `notifications` | In-app notification records |
-| `recruiter_cv_views` | Tracks recruiter CV views |
-| `personal_access_tokens` | Sanctum API tokens |
+| Table                    | Description                                          |
+| ------------------------ | ---------------------------------------------------- |
+| `users`                  | All users (job seekers, recruiters, admins)          |
+| `companies`              | Recruiter company profiles                           |
+| `plans`                  | Subscription plan tiers                              |
+| `subscriptions`          | User plan subscriptions                              |
+| `payments`               | Payment records                                      |
+| `job_categories`         | Job classification categories                        |
+| `jobs`                   | Job listings with status (pending/approved/rejected) |
+| `job_applications`       | Applications made by job seekers                     |
+| `saved_jobs`             | Bookmarked jobs                                      |
+| `cvs`                    | CV documents per user                                |
+| `education`              | CV education entries                                 |
+| `experiences`            | CV work experience entries                           |
+| `skills`                 | CV skills entries                                    |
+| `notifications`          | In-app notification records                          |
+| `recruiter_cv_views`     | Tracks recruiter CV views                            |
+| `personal_access_tokens` | Sanctum API tokens                                   |
 
 ---
 
@@ -170,83 +177,83 @@ jobPortal/
 
 ### Public Routes
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/auth/google` | Redirect to Google OAuth |
-| GET | `/auth/google/callback` | Google OAuth callback |
-| POST | `/auth/register` | Register new user |
-| POST | `/auth/login` | Login with email & password |
-| POST | `/auth/verify-otp` | Verify OTP & receive token |
-| POST | `/auth/resend-otp` | Resend OTP to email |
-| POST | `/auth/forgot-password` | Request password reset OTP |
-| POST | `/auth/reset-password` | Reset password with OTP |
-| GET | `/plans` | List all subscription plans |
-| GET | `/plans/{id}` | Get plan by ID |
-| GET | `/job-categories` | List all job categories |
-| GET | `/jobs` | List all approved jobs |
-| GET | `/jobs/{id}` | Get job details |
+| Method | Endpoint                | Description                 |
+| ------ | ----------------------- | --------------------------- |
+| GET    | `/auth/google`          | Redirect to Google OAuth    |
+| GET    | `/auth/google/callback` | Google OAuth callback       |
+| POST   | `/auth/register`        | Register new user           |
+| POST   | `/auth/login`           | Login with email & password |
+| POST   | `/auth/verify-otp`      | Verify OTP & receive token  |
+| POST   | `/auth/resend-otp`      | Resend OTP to email         |
+| POST   | `/auth/forgot-password` | Request password reset OTP  |
+| POST   | `/auth/reset-password`  | Reset password with OTP     |
+| GET    | `/plans`                | List all subscription plans |
+| GET    | `/plans/{id}`           | Get plan by ID              |
+| GET    | `/job-categories`       | List all job categories     |
+| GET    | `/jobs`                 | List all approved jobs      |
+| GET    | `/jobs/{id}`            | Get job details             |
 
 ### Authenticated Routes (Bearer Token required)
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/auth/logout` | Logout (revoke token) |
-| GET | `/auth/me` | Get current authenticated user |
-| GET/POST | `/cvs` | List / create CVs |
-| GET/PUT/DELETE | `/cvs/{id}` | Get / update / delete CV |
-| GET | `/cvs/{id}/download` | Download CV as PDF |
-| GET/POST/PUT/DELETE | `/cvs/{cvId}/skills` | Manage CV skills |
-| GET/POST/PUT/DELETE | `/cvs/{cvId}/experiences` | Manage CV experiences |
-| GET/POST/PUT/DELETE | `/cvs/{cvId}/educations` | Manage CV education |
-| POST | `/jobs/{jobId}/apply` | Apply for a job |
-| GET | `/my-applications` | List my applications |
-| POST/DELETE | `/jobs/{id}/save` | Save / unsave a job |
-| GET | `/saved-jobs` | List saved jobs |
-| GET | `/notifications` | List notifications |
-| PUT | `/notifications/{id}/read` | Mark notification as read |
-| GET | `/notifications/unread-count` | Unread notification count |
-| POST/GET | `/subscriptions` | Create / get subscription |
-| POST/GET | `/payments` | Create / get payment |
-| POST | `/payments/check/{id}` | Check payment status |
+| Method              | Endpoint                      | Description                    |
+| ------------------- | ----------------------------- | ------------------------------ |
+| POST                | `/auth/logout`                | Logout (revoke token)          |
+| GET                 | `/auth/me`                    | Get current authenticated user |
+| GET/POST            | `/cvs`                        | List / create CVs              |
+| GET/PUT/DELETE      | `/cvs/{id}`                   | Get / update / delete CV       |
+| GET                 | `/cvs/{id}/download`          | Download CV as PDF             |
+| GET/POST/PUT/DELETE | `/cvs/{cvId}/skills`          | Manage CV skills               |
+| GET/POST/PUT/DELETE | `/cvs/{cvId}/experiences`     | Manage CV experiences          |
+| GET/POST/PUT/DELETE | `/cvs/{cvId}/educations`      | Manage CV education            |
+| POST                | `/jobs/{jobId}/apply`         | Apply for a job                |
+| GET                 | `/my-applications`            | List my applications           |
+| POST/DELETE         | `/jobs/{id}/save`             | Save / unsave a job            |
+| GET                 | `/saved-jobs`                 | List saved jobs                |
+| GET                 | `/notifications`              | List notifications             |
+| PUT                 | `/notifications/{id}/read`    | Mark notification as read      |
+| GET                 | `/notifications/unread-count` | Unread notification count      |
+| POST/GET            | `/subscriptions`              | Create / get subscription      |
+| POST/GET            | `/payments`                   | Create / get payment           |
+| POST                | `/payments/check/{id}`        | Check payment status           |
 
 ### Recruiter Routes (auth + recruiter middleware)
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/my-company` | Get recruiter's company |
-| POST | `/companies` | Create company |
-| GET/PUT/DELETE | `/companies/{id}` | Manage company |
-| PUT/DELETE | `/jobs/{id}` | Update / delete job |
-| POST | `/jobs/{id}/close` | Close job listing |
-| POST | `/jobs/{id}/reopen` | Reopen job listing |
-| GET | `/company/applications` | List company applications |
-| GET/PUT | `/applications/{id}` | View / update application status |
-| GET | `/company/dashboard` | Company analytics dashboard |
-| GET/PUT | `/recruiter/settings` | Recruiter profile settings |
+| Method         | Endpoint                | Description                      |
+| -------------- | ----------------------- | -------------------------------- |
+| GET            | `/my-company`           | Get recruiter's company          |
+| POST           | `/companies`            | Create company                   |
+| GET/PUT/DELETE | `/companies/{id}`       | Manage company                   |
+| PUT/DELETE     | `/jobs/{id}`            | Update / delete job              |
+| POST           | `/jobs/{id}/close`      | Close job listing                |
+| POST           | `/jobs/{id}/reopen`     | Reopen job listing               |
+| GET            | `/company/applications` | List company applications        |
+| GET/PUT        | `/applications/{id}`    | View / update application status |
+| GET            | `/company/dashboard`    | Company analytics dashboard      |
+| GET/PUT        | `/recruiter/settings`   | Recruiter profile settings       |
 
 ### Premium Recruiter Routes (requires active subscription)
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/jobs` | Create new job posting |
-| GET | `/my-jobs` | List recruiter's jobs |
-| GET | `/my-jobs/{id}` | Get specific job |
+| Method | Endpoint        | Description            |
+| ------ | --------------- | ---------------------- |
+| POST   | `/jobs`         | Create new job posting |
+| GET    | `/my-jobs`      | List recruiter's jobs  |
+| GET    | `/my-jobs/{id}` | Get specific job       |
 
 ### Admin Routes (auth + admin middleware)
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/auth/getuser` | Get all users |
-| CRUD | `/job-categories` | Manage job categories |
-| CRUD | `/plans` | Manage subscription plans |
-| CRUD | `/subscriptions` | Manage all subscriptions |
-| GET | `/admin/users` | List all users |
-| GET | `/admin/recruiters` | List all recruiters |
-| GET | `/admin/companies` | List all companies |
-| GET | `/admin/jobs/pending` | Pending jobs queue |
-| PUT | `/admin/jobs/{id}/approve` | Approve job |
-| PUT | `/admin/jobs/{id}/reject` | Reject job |
-| GET | `/admin/dashboard` | Admin dashboard stats |
+| Method | Endpoint                   | Description               |
+| ------ | -------------------------- | ------------------------- |
+| GET    | `/auth/getuser`            | Get all users             |
+| CRUD   | `/job-categories`          | Manage job categories     |
+| CRUD   | `/plans`                   | Manage subscription plans |
+| CRUD   | `/subscriptions`           | Manage all subscriptions  |
+| GET    | `/admin/users`             | List all users            |
+| GET    | `/admin/recruiters`        | List all recruiters       |
+| GET    | `/admin/companies`         | List all companies        |
+| GET    | `/admin/jobs/pending`      | Pending jobs queue        |
+| PUT    | `/admin/jobs/{id}/approve` | Approve job               |
+| PUT    | `/admin/jobs/{id}/reject`  | Reject job                |
+| GET    | `/admin/dashboard`         | Admin dashboard stats     |
 
 ---
 
@@ -348,11 +355,11 @@ export const Config = {
 
 ## ?? User Roles
 
-| Role | Access Level |
-|---|---|
-| `user` | Job browsing, applying, CV builder, saved jobs, notifications |
+| Role        | Access Level                                                                 |
+| ----------- | ---------------------------------------------------------------------------- |
+| `user`      | Job browsing, applying, CV builder, saved jobs, notifications                |
 | `recruiter` | All user features + company & job management (subscription required to post) |
-| `admin` | Full platform management access |
+| `admin`     | Full platform management access                                              |
 
 ---
 
@@ -360,9 +367,9 @@ export const Config = {
 
 ```
 Register --? OTP Email --? Verify OTP --? Token Issued --? Authenticated
-   ¦
+   ï¿½
 Login --? (if unverified) --? OTP Email --? Verify OTP --? Token Issued
-   ¦
+   ï¿½
 Google OAuth --? OTP Email --? Verify OTP --? Token Issued
 ```
 
